@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTA Historical Viewer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --danger-bg: #fff7ed;
+      --danger-line: #fed7aa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .shell {
+      width: min(1440px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .nav a {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #99f6e4;
+      border-radius: 6px;
+      padding: 0 12px;
+      color: var(--accent);
+      background: #ecfdf5;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .toolbar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #ffffff;
+      font-size: 14px;
+    }
+
+    .indicators {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      min-height: 34px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      align-items: center;
+      gap: 8px;
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: none;
+    }
+
+    .toggle input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      padding: 0;
+      accent-color: var(--accent);
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+    }
+
+    button {
+      height: 38px;
+      border: 0;
+      border-radius: 6px;
+      color: #ffffff;
+      background: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--accent-strong);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 74px;
+    }
+
+    .metric span {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .metric span[title]::after {
+      content: "?";
+      display: inline-grid;
+      place-items: center;
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #f8fafc;
+      font-size: 11px;
+      line-height: 1;
+      text-transform: none;
+      cursor: help;
+      flex: 0 0 auto;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .chart {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      min-height: 700px;
+    }
+
+    .equity-chart {
+      min-height: 380px;
+      margin-top: 16px;
+    }
+
+    .empty {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-line);
+      border-radius: 8px;
+      padding: 18px;
+      color: #9a3412;
+      font-weight: 700;
+    }
+
+    .inline-action {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr)) minmax(180px, 1fr);
+      gap: 12px;
+      align-items: end;
+      margin-top: 14px;
+    }
+
+    .inline-action label {
+      color: #7c2d12;
+    }
+
+    .inline-action button {
+      background: #9a3412;
+    }
+
+    .inline-action button:hover {
+      background: #7c2d12;
+    }
+
+    .table-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-top: 16px;
+      overflow: hidden;
+    }
+
+    .snip-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .master-test-form {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .snip-form {
+      display: grid;
+      grid-template-columns: minmax(260px, 2fr) repeat(4, minmax(120px, 1fr)) minmax(120px, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+
+    .snip-result {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .status-ok strong {
+      color: #15803d;
+    }
+
+    .status-warn strong {
+      color: #b45309;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .table-header h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .table-header span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #f8fafc;
+    }
+
+    th:first-child,
+    td:first-child,
+    th:nth-child(2),
+    td:nth-child(2) {
+      text-align: left;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        display: block;
+      }
+
+      form,
+      .snip-form,
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      button {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100vw - 20px, 1440px);
+        padding-top: 14px;
+      }
+
+      form,
+      .snip-form,
+      .snip-result,
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>RTA Historical Viewer</h1>
+        <p class="subtitle">Local OHLCV dataset visualization</p>
+      </div>
+      <nav class="nav">
+        <a href="/home">System home</a>
+      </nav>
+    </header>
+
+    <section class="toolbar">
+      <form method="get" action="/">
+        <label>
+          Exchange
+          <select name="exchange">
+            <option value="binance" {% if exchange == "binance" %}selected{% endif %}>binance</option>
+            <option value="coinbase" {% if exchange == "coinbase" %}selected{% endif %}>coinbase</option>
+            <option value="kraken" {% if exchange == "kraken" %}selected{% endif %}>kraken</option>
+            <option value="okx" {% if exchange == "okx" %}selected{% endif %}>okx</option>
+            <option value="bybit" {% if exchange == "bybit" %}selected{% endif %}>bybit</option>
+            {% if exchange not in ["binance", "coinbase", "kraken", "okx", "bybit"] %}
+              <option value="{{ exchange }}" selected>{{ exchange }}</option>
+            {% endif %}
+          </select>
+        </label>
+        <label>
+          Symbol
+          <select name="symbol">
+            <option value="BTC/USDT" {% if symbol == "BTC/USDT" %}selected{% endif %}>BTC/USDT</option>
+            <option value="ETH/USDT" {% if symbol == "ETH/USDT" %}selected{% endif %}>ETH/USDT</option>
+            <option value="SOL/USDT" {% if symbol == "SOL/USDT" %}selected{% endif %}>SOL/USDT</option>
+            <option value="BNB/USDT" {% if symbol == "BNB/USDT" %}selected{% endif %}>BNB/USDT</option>
+            <option value="XRP/USDT" {% if symbol == "XRP/USDT" %}selected{% endif %}>XRP/USDT</option>
+            <option value="ADA/USDT" {% if symbol == "ADA/USDT" %}selected{% endif %}>ADA/USDT</option>
+            {% if symbol not in ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT", "ADA/USDT"] %}
+              <option value="{{ symbol }}" selected>{{ symbol }}</option>
+            {% endif %}
+          </select>
+        </label>
+        <label>
+          Timeframe
+          <select name="timeframe">
+            <option value="15m" {% if timeframe == "15m" %}selected{% endif %}>15m</option>
+            <option value="30m" {% if timeframe == "30m" %}selected{% endif %}>30m</option>
+            <option value="1h" {% if timeframe == "1h" %}selected{% endif %}>1h</option>
+            <option value="4h" {% if timeframe == "4h" %}selected{% endif %}>4h</option>
+            <option value="12h" {% if timeframe == "12h" %}selected{% endif %}>12h</option>
+            <option value="1d" {% if timeframe == "1d" %}selected{% endif %}>1d</option>
+            <option value="3d" {% if timeframe == "3d" %}selected{% endif %}>3d</option>
+            <option value="1w" {% if timeframe == "1w" %}selected{% endif %}>1w</option>
+            {% if timeframe not in ["15m", "30m", "1h", "4h", "12h", "1d", "3d", "1w"] %}
+              <option value="{{ timeframe }}" selected>{{ timeframe }}</option>
+            {% endif %}
+          </select>
+        </label>
+        <label>
+          Max rows
+          <input name="max_rows" type="number" min="50" max="250000" value="{{ max_rows }}">
+        </label>
+        <button type="submit">Load chart</button>
+        <label>
+          Fetch since
+          <input name="fetch_since" value="{{ fetch_since }}" placeholder="2024-01-01" autocomplete="off">
+        </label>
+        <label>
+          Fetch until
+          <input name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
+        </label>
+        <label>
+          Batch limit
+          <input name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
+        </label>
+        <label>
+          Max batches
+          <input name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
+        </label>
+        <button type="submit" name="fetch_history" value="true">Download from exchange</button>
+        <button type="submit" name="fetch_all_history" value="true">Download all listed</button>
+        <button type="submit" name="compare_timeframes" value="true">Compare timeframes</button>
+        <label>
+          Validation %
+          <input name="validation_pct" type="number" min="5" max="80" step="1" value="{{ validation_pct }}">
+        </label>
+        <label>
+          Strategy
+          <select name="strategy">
+            <option value="none" {% if strategy == "none" %}selected{% endif %}>None</option>
+            <option value="sma_crossover" {% if strategy == "sma_crossover" %}selected{% endif %}>SMA 20/50 Crossover</option>
+            <option value="ema_crossover" {% if strategy == "ema_crossover" %}selected{% endif %}>EMA 20/50 Crossover</option>
+            <option value="rsi_mean_reversion" {% if strategy == "rsi_mean_reversion" %}selected{% endif %}>RSI 14 Mean Reversion</option>
+            <option value="bollinger_mean_reversion" {% if strategy == "bollinger_mean_reversion" %}selected{% endif %}>Bollinger Mean Reversion</option>
+            <option value="bollinger_trend_reversion" {% if strategy == "bollinger_trend_reversion" %}selected{% endif %}>Bollinger Trend Filtered</option>
+            <option value="ema_trend_capture" {% if strategy == "ema_trend_capture" %}selected{% endif %}>EMA Trend Capture 80/300</option>
+            <option value="ema_donchian_trend" {% if strategy == "ema_donchian_trend" %}selected{% endif %}>EMA Donchian Trend 50/200</option>
+            <option value="adaptive_trend_guard" {% if strategy == "adaptive_trend_guard" %}selected{% endif %}>Adaptive Trend Guard 80/300</option>
+            <option value="bull_trend_rider" {% if strategy == "bull_trend_rider" %}selected{% endif %}>Bull Trend Rider 80/300</option>
+            <option value="bear_trend_rider" {% if strategy == "bear_trend_rider" %}selected{% endif %}>Bear Trend Rider 80/300</option>
+            <option value="panic_dip_buyer" {% if strategy == "panic_dip_buyer" %}selected{% endif %}>Panic Dip Buyer</option>
+            <option value="ultimate_hybrid" {% if strategy == "ultimate_hybrid" %}selected{% endif %}>Ultimate Hybrid System</option>
+          </select>
+        </label>
+        <label>
+          Start date
+          <input name="start_date" value="{{ start_date }}" placeholder="2024-01-01" autocomplete="off">
+        </label>
+        <label>
+          End date
+          <input name="end_date" value="{{ end_date }}" placeholder="2026-05-14" autocomplete="off">
+        </label>
+        <label>
+          Fast period
+          <input name="fast_period" type="number" min="1" max="500" value="{{ fast_period }}">
+        </label>
+        <label>
+          Slow period
+          <input name="slow_period" type="number" min="2" max="1000" value="{{ slow_period }}">
+        </label>
+        <label>
+          RSI period
+          <input name="rsi_period" type="number" min="2" max="200" value="{{ rsi_period }}">
+        </label>
+        <label>
+          RSI oversold
+          <input name="rsi_oversold" type="number" min="0" max="100" step="0.1" value="{{ rsi_oversold }}">
+        </label>
+        <label>
+          RSI overbought
+          <input name="rsi_overbought" type="number" min="0" max="100" step="0.1" value="{{ rsi_overbought }}">
+        </label>
+        <label>
+          BB period
+          <input name="bollinger_period" type="number" min="2" max="500" value="{{ bollinger_period }}">
+        </label>
+        <label>
+          BB std dev
+          <input name="bollinger_std" type="number" min="0.1" max="10" step="0.1" value="{{ bollinger_std }}">
+        </label>
+        <label>
+          Fee bps
+          <input name="fee_bps" type="number" min="0" max="1000" step="0.01" value="{{ fee_bps }}">
+        </label>
+        <label>
+          Slippage bps
+          <input name="slippage_bps" type="number" min="0" max="1000" step="0.01" value="{{ slippage_bps }}">
+        </label>
+        <label>
+          Initial USD
+          <input name="initial_capital" type="number" min="1" step="0.01" value="{{ initial_capital }}">
+        </label>
+        <label>
+          Position mode
+          <select name="position_mode">
+            <option value="compound" {% if position_mode == "compound" %}selected{% endif %}>Compound equity</option>
+            <option value="fixed" {% if position_mode == "fixed" %}selected{% endif %}>Fixed stake</option>
+          </select>
+        </label>
+        <div class="indicators">
+          <label class="toggle">
+            <input type="hidden" name="show_sma_20" value="false">
+            <input type="checkbox" name="show_sma_20" value="true" {% if show_sma_20 %}checked{% endif %}>
+            <span class="swatch" style="background: #2563eb;"></span>
+            SMA 20
+          </label>
+          <label class="toggle">
+            <input type="hidden" name="show_sma_50" value="false">
+            <input type="checkbox" name="show_sma_50" value="true" {% if show_sma_50 %}checked{% endif %}>
+            <span class="swatch" style="background: #f59e0b;"></span>
+            SMA 50
+          </label>
+          <label class="toggle">
+            <input type="hidden" name="show_ema_200" value="false">
+            <input type="checkbox" name="show_ema_200" value="true" {% if show_ema_200 %}checked{% endif %}>
+            <span class="swatch" style="background: #7c3aed;"></span>
+            EMA 200
+          </label>
+        </div>
+      </form>
+    </section>
+
+    {% if data_message %}
+      <section class="empty" style="margin-bottom: 16px; color: #166534; background: #f0fdf4; border-color: #bbf7d0;">
+        {{ data_message }}
+        {% if data_messages %}
+          <ul style="margin: 10px 0 0; padding-left: 18px; font-weight: 700;">
+            {% for message in data_messages[:12] %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            {% if data_messages | length > 12 %}
+              <li>... {{ data_messages | length - 12 }} more saved datasets</li>
+            {% endif %}
+          </ul>
+        {% endif %}
+      </section>
+    {% endif %}
+    {% if data_error %}
+      <section class="empty" style="margin-bottom: 16px;">
+        {{ data_error }}
+        {% if data_errors %}
+          <ul style="margin: 10px 0 0; padding-left: 18px; font-weight: 700;">
+            {% for error in data_errors[:12] %}
+              <li>{{ error }}</li>
+            {% endfor %}
+            {% if data_errors | length > 12 %}
+              <li>... {{ data_errors | length - 12 }} more failed datasets</li>
+            {% endif %}
+          </ul>
+        {% endif %}
+        <form class="inline-action" method="get" action="/">
+          <input type="hidden" name="exchange" value="{{ exchange }}">
+          <input type="hidden" name="symbol" value="{{ symbol }}">
+          <input type="hidden" name="timeframe" value="{{ timeframe }}">
+          <input type="hidden" name="max_rows" value="{{ max_rows }}">
+          <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
+          <input type="hidden" name="strategy" value="{{ strategy }}">
+          <input type="hidden" name="start_date" value="{{ start_date }}">
+          <input type="hidden" name="end_date" value="{{ end_date }}">
+          <input type="hidden" name="fast_period" value="{{ fast_period }}">
+          <input type="hidden" name="slow_period" value="{{ slow_period }}">
+          <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
+          <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
+          <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
+          <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
+          <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
+          <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
+          <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
+          <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
+          <input type="hidden" name="position_mode" value="{{ position_mode }}">
+          <label>
+            Fetch since
+            <input name="fetch_since" value="{{ fetch_since }}" autocomplete="off">
+          </label>
+          <label>
+            Fetch until
+            <input name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
+          </label>
+          <label>
+            Batch limit
+            <input name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
+          </label>
+          <label>
+            Max batches
+            <input name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
+          </label>
+          <button type="submit" name="fetch_history" value="true">Download history</button>
+        </form>
+      </section>
+    {% endif %}
+
+    <section class="snip-panel">
+      <form class="master-test-form" method="get" action="/">
+        <label>
+          Probar Masters
+          <select name="master_config">
+            <option value="">Select saved master</option>
+            {% for master in saved_masters %}
+              <option value="{{ master.name }}" {% if master_config == master.name %}selected{% endif %}>{{ master.name }} · {{ master.symbol }} · {{ master.main_timeframe }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit">Load master</button>
+      </form>
+      {% if selected_master_config %}
+        <p class="subtitle" style="margin-top: 10px;">
+          Loaded {{ selected_master_config.name }}:
+          {{ selected_master_config.symbol }} · {{ selected_master_config.main_timeframe }} · {{ selected_master_config.main_strategy }}
+        </p>
+      {% endif %}
+    </section>
+
+    <section class="snip-panel">
+      <form class="snip-form" method="get" action="/">
+        <input type="hidden" name="exchange" value="{{ exchange }}">
+        <input type="hidden" name="symbol" value="{{ symbol }}">
+        <input type="hidden" name="timeframe" value="{{ timeframe }}">
+        <input type="hidden" name="max_rows" value="{{ max_rows }}">
+        <input type="hidden" name="fetch_since" value="{{ fetch_since }}">
+        <input type="hidden" name="fetch_until" value="{{ fetch_until }}">
+        <input type="hidden" name="fetch_batch_limit" value="{{ fetch_batch_limit }}">
+        <input type="hidden" name="fetch_max_batches" value="{{ fetch_max_batches }}">
+        <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
+        <input type="hidden" name="strategy" value="{{ strategy }}">
+        <input type="hidden" name="start_date" value="{{ start_date }}">
+        <input type="hidden" name="end_date" value="{{ end_date }}">
+        <input type="hidden" name="fast_period" value="{{ fast_period }}">
+        <input type="hidden" name="slow_period" value="{{ slow_period }}">
+        <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
+        <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
+        <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
+        <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
+        <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
+        <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
+        <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
+        <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
+        <input type="hidden" name="position_mode" value="{{ position_mode }}">
+        <label>
+          SnipHedge Polymarket URL / slug
+          <input name="snip_url" value="{{ snip_url }}" autocomplete="off">
+        </label>
+        <label>
+          Up bid trigger
+          <input name="snip_trigger_up_bid" type="number" min="0" max="1" step="0.01" value="{{ snip_trigger_up_bid }}">
+        </label>
+        <label>
+          Down bid trigger
+          <input name="snip_trigger_down_bid" type="number" min="0" max="1" step="0.01" value="{{ snip_trigger_down_bid }}">
+        </label>
+        <label>
+          Up limit
+          <input name="snip_limit_up" type="number" min="0" max="1" step="0.01" value="{{ snip_limit_up }}">
+        </label>
+        <label>
+          Down limit
+          <input name="snip_limit_down" type="number" min="0" max="1" step="0.01" value="{{ snip_limit_down }}">
+        </label>
+        <button type="submit">Check hedge</button>
+      </form>
+      {% if snip_error %}
+        <section class="empty" style="margin-top: 14px;">
+          {{ snip_error }}
+          <form class="inline-action" method="get" action="/">
+            <input type="hidden" name="exchange" value="{{ exchange }}">
+            <input type="hidden" name="symbol" value="{{ symbol }}">
+            <input type="hidden" name="timeframe" value="{{ timeframe }}">
+            <input type="hidden" name="max_rows" value="{{ max_rows }}">
+            <input type="hidden" name="strategy" value="{{ strategy }}">
+            <input type="hidden" name="start_date" value="{{ start_date }}">
+            <input type="hidden" name="end_date" value="{{ end_date }}">
+            <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
+            <input type="hidden" name="fast_period" value="{{ fast_period }}">
+            <input type="hidden" name="slow_period" value="{{ slow_period }}">
+            <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
+            <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
+            <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
+            <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
+            <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
+            <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
+            <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
+            <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
+            <input type="hidden" name="position_mode" value="{{ position_mode }}">
+            <label>
+              Fetch since
+              <input name="fetch_since" value="{{ fetch_since }}" autocomplete="off">
+            </label>
+            <label>
+              Fetch until
+              <input name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
+            </label>
+            <label>
+              Batch limit
+              <input name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
+            </label>
+            <label>
+              Max batches
+              <input name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
+            </label>
+            <button type="submit" name="fetch_history" value="true">Download history</button>
+          </form>
+        </section>
+      {% endif %}
+      {% if snip_preview %}
+        <div class="snip-result">
+          <div class="metric">
+            <span>Event</span>
+            <strong>{{ snip_preview.title }}</strong>
+          </div>
+          <div class="metric">
+            <span>Slug</span>
+            <strong>{{ snip_preview.slug }}</strong>
+          </div>
+          <div class="metric">
+            <span>Interval</span>
+            <strong>{{ snip_preview.interval }}</strong>
+          </div>
+          <div class="metric {% if snip_preview.condition == 'YES' %}status-ok{% else %}status-warn{% endif %}">
+            <span>Condition</span>
+            <strong>{{ snip_preview.condition }}</strong>
+          </div>
+          <div class="metric">
+            <span>{{ snip_preview.up_label }} bid / ask</span>
+            <strong>{{ snip_preview.up_bid }} / {{ snip_preview.up_ask }}</strong>
+          </div>
+          <div class="metric">
+            <span>{{ snip_preview.down_label }} bid / ask</span>
+            <strong>{{ snip_preview.down_bid }} / {{ snip_preview.down_ask }}</strong>
+          </div>
+          <div class="metric">
+            <span>Configured margin</span>
+            <strong>{{ snip_preview.guaranteed_margin }}</strong>
+          </div>
+          <div class="metric">
+            <span>Mode</span>
+            <strong>Preview only</strong>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="summary">
+      <div class="metric">
+        <span>Rows</span>
+        <strong>{{ summary.rows }}</strong>
+      </div>
+      <div class="metric">
+        <span>Shown</span>
+        <strong>{{ summary.shown_rows }}</strong>
+      </div>
+      <div class="metric">
+        <span>From</span>
+        <strong>{{ summary.from or "-" }}</strong>
+      </div>
+      <div class="metric">
+        <span>To</span>
+        <strong>{{ summary.to or "-" }}</strong>
+      </div>
+      <div class="metric">
+        <span>Path</span>
+        <strong>{{ summary.path }}</strong>
+      </div>
+      <div class="metric">
+        <span>Strategy</span>
+        <strong>{{ summary.strategy }}</strong>
+      </div>
+      <div class="metric">
+        <span>Buy signals</span>
+        <strong>{{ summary.buy_signals }}</strong>
+      </div>
+      <div class="metric">
+        <span>Sell signals</span>
+        <strong>{{ summary.sell_signals }}</strong>
+      </div>
+      <div class="metric">
+        <span>Strategy gain</span>
+        <strong>{{ summary.total_return_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Initial USD</span>
+        <strong>{{ summary.initial_capital }}</strong>
+      </div>
+      <div class="metric">
+        <span>Position mode</span>
+        <strong>{{ summary.position_mode }}</strong>
+      </div>
+      <div class="metric">
+        <span>Final USD</span>
+        <strong>{{ summary.final_equity }}</strong>
+      </div>
+      <div class="metric">
+        <span>P/L USD</span>
+        <strong>{{ summary.profit_loss }}</strong>
+      </div>
+      <div class="metric">
+        <span>Buy & hold</span>
+        <strong>{{ summary.buy_and_hold_return_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Alpha vs buy & hold</span>
+        <strong>{{ summary.alpha_vs_buy_hold_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Return / drawdown</span>
+        <strong>{{ summary.return_drawdown_ratio }}</strong>
+      </div>
+      <div class="metric">
+        <span>Max drawdown</span>
+        <strong>{{ summary.max_drawdown_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Trades</span>
+        <strong>{{ summary.trades }}</strong>
+      </div>
+      <div class="metric">
+        <span>Win rate</span>
+        <strong>{{ summary.win_rate_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Profit factor</span>
+        <strong>{{ summary.profit_factor }}</strong>
+      </div>
+      <div class="metric">
+        <span>Best trade</span>
+        <strong>{{ summary.best_trade_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Worst trade</span>
+        <strong>{{ summary.worst_trade_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Avg trade</span>
+        <strong>{{ summary.average_trade_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Win streak</span>
+        <strong>{{ summary.max_winning_streak }}</strong>
+      </div>
+      <div class="metric">
+        <span>Loss streak</span>
+        <strong>{{ summary.max_losing_streak }}</strong>
+      </div>
+      <div class="metric">
+        <span>Fee bps</span>
+        <strong>{{ summary.fee_bps }}</strong>
+      </div>
+      <div class="metric">
+        <span>Slippage bps</span>
+        <strong>{{ summary.slippage_bps }}</strong>
+      </div>
+      <div class="metric">
+        <span>Train rows</span>
+        <strong>{{ summary.train_rows }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation rows</span>
+        <strong>{{ summary.validation_rows }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation from</span>
+        <strong>{{ summary.validation_from }}</strong>
+      </div>
+      <div class="metric">
+        <span>Train gain</span>
+        <strong>{{ summary.train_return_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Train drawdown</span>
+        <strong>{{ summary.train_drawdown_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Train profit factor</span>
+        <strong>{{ summary.train_profit_factor }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation gain</span>
+        <strong>{{ summary.validation_return_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation buy & hold</span>
+        <strong>{{ summary.validation_buy_and_hold_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation alpha</span>
+        <strong>{{ summary.validation_alpha_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation drawdown</span>
+        <strong>{{ summary.validation_drawdown_pct }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation profit factor</span>
+        <strong>{{ summary.validation_profit_factor }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation return / DD</span>
+        <strong>{{ summary.validation_return_drawdown_ratio }}</strong>
+      </div>
+      <div class="metric">
+        <span>Validation verdict</span>
+        <strong>{{ summary.validation_verdict }}</strong>
+      </div>
+    </section>
+
+    {% if chart_html %}
+      <section class="chart">
+        {{ chart_html | safe }}
+      </section>
+      {% if equity_chart_html %}
+        <section class="chart equity-chart">
+          {{ equity_chart_html | safe }}
+        </section>
+      {% endif %}
+      {% if trade_log %}
+        <section class="table-panel">
+          <div class="table-header">
+            <h2>Trade Log</h2>
+            <span>Last {{ trade_log | length }} closed trades</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entry datetime</th>
+                  <th>Exit datetime</th>
+                  <th>Entry price</th>
+                  <th>Exit price</th>
+                  <th>Return</th>
+                  <th>P/L USD</th>
+                  <th>Equity after</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for trade in trade_log %}
+                  <tr>
+                    <td>{{ trade.entry_datetime }}</td>
+                    <td>{{ trade.exit_datetime }}</td>
+                    <td>{{ trade.entry_price }}</td>
+                    <td>{{ trade.exit_price }}</td>
+                    <td>{{ trade.return_pct }}</td>
+                    <td>{{ trade.pl_usd }}</td>
+                    <td>{{ trade.equity_after }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+      {% if compare_results %}
+        <section class="table-panel">
+          <div class="table-header">
+            <h2>Timeframe Comparison</h2>
+            <span>{{ strategy }} | {{ start_date or "all" }} to {{ end_date or "latest" }}</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timeframe</th>
+                  <th>Status</th>
+                  <th>Rows</th>
+                  <th>Strategy gain</th>
+                  <th>Buy & hold</th>
+                  <th>Alpha</th>
+                  <th>Drawdown</th>
+                  <th>Trades</th>
+                  <th>Profit factor</th>
+                  <th>Validation gain</th>
+                  <th>Validation alpha</th>
+                  <th>Validation PF</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in compare_results %}
+                  <tr>
+                    <td>{{ row.timeframe }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.rows }}</td>
+                    <td>{{ row.strategy_gain }}</td>
+                    <td>{{ row.buy_hold }}</td>
+                    <td>{{ row.alpha }}</td>
+                    <td>{{ row.drawdown }}</td>
+                    <td>{{ row.trades }}</td>
+                    <td>{{ row.profit_factor }}</td>
+                    <td>{{ row.validation_gain }}</td>
+                    <td>{{ row.validation_alpha }}</td>
+                    <td>{{ row.validation_profit_factor }}</td>
+                    <td>{{ row.verdict }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+    {% else %}
+      <section class="empty">
+        No local dataset found for {{ exchange }} {{ symbol }} {{ timeframe }}.
+        Use the "Download from exchange" button above to fetch it with ccxt and save it locally.
+        <form class="inline-action" method="get" action="/">
+          <input type="hidden" name="exchange" value="{{ exchange }}">
+          <input type="hidden" name="symbol" value="{{ symbol }}">
+          <input type="hidden" name="timeframe" value="{{ timeframe }}">
+          <input type="hidden" name="max_rows" value="{{ max_rows }}">
+          <input type="hidden" name="strategy" value="{{ strategy }}">
+          <input type="hidden" name="start_date" value="{{ start_date }}">
+          <input type="hidden" name="end_date" value="{{ end_date }}">
+          <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
+          <input type="hidden" name="fast_period" value="{{ fast_period }}">
+          <input type="hidden" name="slow_period" value="{{ slow_period }}">
+          <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
+          <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
+          <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
+          <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
+          <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
+          <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
+          <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
+          <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
+          <input type="hidden" name="position_mode" value="{{ position_mode }}">
+          <label>
+            Fetch since
+            <input name="fetch_since" value="{{ fetch_since }}" autocomplete="off">
+          </label>
+          <label>
+            Fetch until
+            <input name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
+          </label>
+          <label>
+            Batch limit
+            <input name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
+          </label>
+          <label>
+            Max batches
+            <input name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
+          </label>
+          <button type="submit" name="fetch_history" value="true">Download history</button>
+        </form>
+      </section>
+      {% if compare_results %}
+        <section class="table-panel">
+          <div class="table-header">
+            <h2>Timeframe Comparison</h2>
+            <span>{{ strategy }} | {{ start_date or "all" }} to {{ end_date or "latest" }}</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timeframe</th>
+                  <th>Status</th>
+                  <th>Rows</th>
+                  <th>Strategy gain</th>
+                  <th>Buy & hold</th>
+                  <th>Alpha</th>
+                  <th>Drawdown</th>
+                  <th>Trades</th>
+                  <th>Profit factor</th>
+                  <th>Validation gain</th>
+                  <th>Validation alpha</th>
+                  <th>Validation PF</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in compare_results %}
+                  <tr>
+                    <td>{{ row.timeframe }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.rows }}</td>
+                    <td>{{ row.strategy_gain }}</td>
+                    <td>{{ row.buy_hold }}</td>
+                    <td>{{ row.alpha }}</td>
+                    <td>{{ row.drawdown }}</td>
+                    <td>{{ row.trades }}</td>
+                    <td>{{ row.profit_factor }}</td>
+                    <td>{{ row.validation_gain }}</td>
+                    <td>{{ row.validation_alpha }}</td>
+                    <td>{{ row.validation_profit_factor }}</td>
+                    <td>{{ row.verdict }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+    {% endif %}
+  </main>
+  <script>
+    const metricHelp = {
+      "Rows": "Total de velas disponibles despues del filtro de fechas.",
+      "Shown": "Velas dibujadas en el grafico. Puedes subir Max rows para ver mas historial.",
+      "From": "Primera fecha incluida en el backtest actual.",
+      "To": "Ultima fecha incluida en el backtest actual.",
+      "Path": "Archivo CSV local que alimenta este visor.",
+      "Strategy": "Estrategia aplicada al historico seleccionado.",
+      "Buy signals": "Cantidad de entradas long generadas por la estrategia.",
+      "Sell signals": "Cantidad de salidas generadas por la estrategia.",
+      "Strategy gain": "Rendimiento porcentual de la estrategia contra el capital inicial.",
+      "Initial USD": "Capital inicial usado para simular las operaciones.",
+      "Position mode": "Fixed stake usa el mismo capital base por trade; Compound reinvierte el equity acumulado.",
+      "Final USD": "Capital final despues de ejecutar todas las operaciones simuladas.",
+      "P/L USD": "Ganancia o perdida neta en dolares simulados.",
+      "Buy & hold": "Resultado de comprar el activo al inicio y venderlo al final.",
+      "Alpha vs buy & hold": "Diferencia entre rendimiento de la estrategia y buy & hold. Positivo significa que la estrategia supero al benchmark.",
+      "Return / drawdown": "Rendimiento dividido entre drawdown absoluto. Mide cuanta ganancia produjo por unidad de caida maxima.",
+      "Max drawdown": "Peor caida porcentual desde un maximo del equity hasta su minimo posterior.",
+      "Trades": "Operaciones cerradas durante el backtest.",
+      "Win rate": "Porcentaje de operaciones cerradas con ganancia.",
+      "Profit factor": "Ganancia bruta dividida entre perdida bruta. Mayor a 1 indica ventaja historica.",
+      "Best trade": "Mejor operacion cerrada en porcentaje.",
+      "Worst trade": "Peor operacion cerrada en porcentaje.",
+      "Avg trade": "Promedio porcentual por operacion cerrada.",
+      "Win streak": "Mayor racha de operaciones ganadoras consecutivas.",
+      "Loss streak": "Mayor racha de operaciones perdedoras consecutivas.",
+      "Fee bps": "Comision simulada en basis points. 10 bps equivale a 0.10%.",
+      "Slippage bps": "Costo simulado por deslizamiento de precio. 1 bps equivale a 0.01%.",
+      "Train rows": "Velas usadas en el tramo de entrenamiento.",
+      "Validation rows": "Velas usadas en el tramo de validacion fuera de entrenamiento.",
+      "Validation from": "Fecha donde empieza el tramo de validacion.",
+      "Train gain": "Resultado de la estrategia solo en entrenamiento.",
+      "Train drawdown": "Peor caida de equity solo en entrenamiento.",
+      "Train profit factor": "Profit factor solo en entrenamiento.",
+      "Validation gain": "Resultado de la estrategia en el tramo de validacion.",
+      "Validation buy & hold": "Buy & hold calculado solo en validacion.",
+      "Validation alpha": "Diferencia entre estrategia y buy & hold solo en validacion.",
+      "Validation drawdown": "Peor caida de equity en validacion.",
+      "Validation profit factor": "Profit factor en validacion.",
+      "Validation return / DD": "Rendimiento de validacion dividido entre drawdown absoluto de validacion.",
+      "Validation verdict": "Lectura rapida: Promising si gana, supera buy & hold y profit factor es mayor que 1."
+    };
+
+    document.querySelectorAll(".metric span").forEach((label) => {
+      const key = label.textContent.trim();
+      if (metricHelp[key]) {
+        label.title = metricHelp[key];
+      }
+    });
+  </script>
+</body>
+</html>

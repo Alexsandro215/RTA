@@ -1,0 +1,73 @@
+[
+  {
+    "name": "BTC 1h Defensive",
+    "symbol": "BTC/USDT",
+    "main_strategy": "adaptive_trend_guard",
+    "main_timeframe": "1h",
+    "main_allocation_pct": 70.0,
+    "rebound_strategy": "panic_dip_buyer",
+    "rebound_allocation_pct": 20.0,
+    "rebound_flags": [
+      "panic_flush",
+      "base_reclaim"
+    ],
+    "sideways_strategy": "bollinger_mean_reversion",
+    "sideways_allocation_pct": 15.0,
+    "sideways_flags": [
+      "sideways_regime"
+    ],
+    "defensive_strategy": "none",
+    "defensive_cash_pct": 100.0,
+    "defensive_flags": [
+      "bear_regime",
+      "breakdown_guard"
+    ]
+  },
+  {
+    "name": "BTC Core",
+    "symbol": "BTC/USDT",
+    "main_strategy": "adaptive_trend_guard",
+    "main_timeframe": "1h",
+    "main_allocation_pct": 100.0,
+    "rebound_strategy": "panic_dip_buyer",
+    "rebound_allocation_pct": 20.0,
+    "rebound_flags": [
+      "panic_flush",
+      "base_reclaim"
+    ],
+    "sideways_strategy": "bollinger_mean_reversion",
+    "sideways_allocation_pct": 15.0,
+    "sideways_flags": [
+      "sideways_regime"
+    ],
+    "defensive_strategy": "none",
+    "defensive_cash_pct": 100.0,
+    "defensive_flags": [
+      "bear_regime",
+      "breakdown_guard"
+    ]
+  },
+  {
+    "name": "P2",
+    "symbol": "BTC/USDT",
+    "main_strategy": "adaptive_trend_guard",
+    "main_timeframe": "1h",
+    "main_allocation_pct": 70.0,
+    "rebound_strategy": "panic_dip_buyer",
+    "rebound_allocation_pct": 50.0,
+    "rebound_flags": [
+      "panic_flush",
+      "base_reclaim"
+    ],
+    "sideways_strategy": "bull_trend_rider",
+    "sideways_allocation_pct": 30.0,
+    "sideways_flags": [
+      "sideways_regime"
+    ],
+    "defensive_strategy": "rsi_mean_reversion",
+    "defensive_cash_pct": 100.0,
+    "defensive_flags": [
+      "breakdown_guard"
+    ]
+  }
+]
