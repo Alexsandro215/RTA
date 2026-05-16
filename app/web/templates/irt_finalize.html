@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finalizar IRT</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --soft: #f8fafc;
+      --danger: #b91c1c;
+      --danger-bg: #fff1f2;
+      --danger-line: #fecdd3;
+      --success-bg: #f0fdf4;      
+      --success-line: #bbf7d0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .shell {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    header,
+    .topline,
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .subtitle,
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    a,
+    button {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 14px;
+      color: #ffffff;
+      background: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a.secondary,
+    button.secondary {
+      color: var(--accent);
+      background: #ecfdf5;
+      border: 1px solid #99f6e4;
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    a:hover,
+    button:hover {
+      background: var(--accent-strong);
+      color: #ffffff;
+    }
+
+    .panel {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--panel);
+    }
+
+    .notice {
+      margin-top: 16px;
+      border: 1px solid var(--success-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--success-bg);
+      color: #166534;
+      font-weight: 700;
+    }
+
+    .warning {
+      margin-top: 16px;
+      border: 1px solid var(--danger-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--danger-bg);
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      min-height: 64px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--soft);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .gain {
+      color: #15803d;
+    }
+
+    .loss {
+      color: var(--danger);
+    }
+
+    .flat {
+      color: var(--text);
+    }
+
+    form {
+      margin-top: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .table-wrap {
+      margin-top: 12px;
+      overflow-x: auto;
+    }
+
+    @media (max-width: 820px) {
+      header,
+      .topline,
+      .actions {
+        display: grid;
+      }
+
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>Finalizar IRT</h1>
+        <p class="subtitle">Revisa el cierre antes de detener esta estrategia ficticia.</p>
+      </div>
+      <div class="actions">
+        <a class="secondary" href="/home">Home</a>
+        {% if irt_href and not completed %}
+          <a class="secondary" href="{{ irt_href }}">Volver a IRT</a>
+        {% endif %}
+      </div>
+    </header>
+
+    {% if message %}
+      <section class="notice">{{ message }}</section>
+    {% endif %}
+
+    {% if not found %}
+      <section class="panel">
+        <h2>No hay ejecucion activa</h2>
+        <p class="meta" style="margin-top: 8px;">Puede que ya se haya finalizado o que haya cambiado la configuracion.</p>
+      </section>
+    {% else %}
+      <section class="panel">
+        <div class="topline">
+          <div>
+            <h2>{{ run.symbol }} | {{ run.timeframe }}</h2>
+            <p class="meta">Estrategia: {{ summary.strategy }}</p>
+          </div>
+          <p class="meta">Ultimo dato: {{ close_preview.latest_datetime }} | {{ close_preview.latest_price }}</p>
+        </div>
+
+        {% if close_preview.has_open_position and not completed %}
+          <section class="warning">
+            Hay una compra ficticia activa. Si confirmas, el sistema vendera automaticamente al ultimo precio disponible, aplicando slippage y fee.
+          </section>
+        {% endif %}
+
+        <section class="summary">
+          <div class="metric"><span>Estado</span><strong>{% if completed %}Finalizada{% else %}Pendiente de confirmar{% endif %}</strong></div>
+          <div class="metric"><span>Posicion</span><strong>{% if close_preview.has_open_position %}Compra activa{% else %}Sin posicion{% endif %}</strong></div>
+          <div class="metric"><span>Capital inicial</span><strong>{{ summary.initial_capital }}</strong></div>
+          <div class="metric"><span>Equity actual</span><strong>{{ close_preview.current_equity }}</strong></div>
+          <div class="metric"><span>Precio de cierre</span><strong>{{ close_preview.forced_exit_price }}</strong></div>
+          <div class="metric"><span>Equity final</span><strong>{{ close_preview.final_equity }}</strong></div>
+          <div class="metric"><span>Ganancia/Perdida</span><strong class="{{ close_preview.profit_loss_class }}">{{ close_preview.final_profit_loss }}</strong></div>
+          <div class="metric"><span>Rendimiento</span><strong>{{ close_preview.final_return_pct }}</strong></div>
+          <div class="metric"><span>Trades</span><strong>{{ summary.trades }}</strong></div>
+          <div class="metric"><span>Win rate</span><strong>{{ summary.win_rate_pct }}</strong></div>
+          <div class="metric"><span>Profit factor</span><strong>{{ summary.profit_factor }}</strong></div>
+          <div class="metric"><span>Drawdown</span><strong>{{ summary.max_drawdown_pct }}</strong></div>
+        </section>
+
+        {% if not completed %}
+          <form method="post" action="/irt/finalize">
+            <input type="hidden" name="symbol" value="{{ run.symbol }}">
+            <input type="hidden" name="timeframe" value="{{ run.timeframe }}">
+            <input type="hidden" name="strategy" value="{{ run.strategy }}">
+            <input type="hidden" name="confirm" value="yes">
+            <div class="actions">
+              <button class="danger" type="submit">Si, finalizar estrategia</button>
+              <a class="secondary" href="/home">Cancelar</a>
+            </div>
+          </form>
+        {% else %}
+          <div class="actions" style="margin-top: 16px;">
+            <a href="/home">Volver al Home</a>
+          </div>
+        {% endif %}
+      </section>
+
+      {% if trade_log %}
+        <section class="panel">
+          <div class="topline">
+            <h2>Resumen de trades</h2>
+            <p class="meta">{{ trade_log | length }} cerrados</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entrada</th>
+                  <th>Salida</th>
+                  <th>Precio entrada</th>
+                  <th>Precio salida</th>
+                  <th>Retorno</th>
+                  <th>P/L USD</th>
+                  <th>Equity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for trade in trade_log %}
+                  <tr>
+                    <td>{{ trade.entry_datetime }}</td>
+                    <td>{{ trade.exit_datetime }}</td>
+                    <td>{{ trade.entry_price }}</td>
+                    <td>{{ trade.exit_price }}</td>
+                    <td>{{ trade.return_pct }}</td>
+                    <td>{{ trade.pl_usd }}</td>
+                    <td>{{ trade.equity_after }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endif %}
+    {% endif %}
+  </main>
+</body>
+</html>

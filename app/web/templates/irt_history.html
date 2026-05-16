@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial IRT</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --soft: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .shell {
+      width: min(1440px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    .subtitle,
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    a {
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 14px;
+      color: #ffffff;
+      background: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    a.secondary {
+      color: var(--accent);
+      background: #ecfdf5;
+      border: 1px solid #99f6e4;
+    }
+
+    a:hover {
+      background: var(--accent-strong);
+      color: #ffffff;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .gain {
+      color: #15803d;
+      font-weight: 800;
+    }
+
+    .loss {
+      color: #b91c1c;
+      font-weight: 800;
+    }
+
+    .flat {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 24px;
+      background: var(--panel);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    @media (max-width: 760px) {
+      header {
+        display: block;
+      }
+
+      .nav {
+        margin-top: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>Historial IRT</h1>
+        <p class="subtitle">Ejecuciones ficticias cerradas y su resultado final.</p>
+      </div>
+      <nav class="nav">
+        <a class="secondary" href="/home">Home</a>
+        <a class="secondary" href="/">TestBack</a>
+      </nav>
+    </header>
+
+    {% if history_rows %}
+      <section class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Timeframe</th>
+                <th>Strategy</th>
+                <th>Inicio</th>
+                <th>Cierre</th>
+                <th>Inicial</th>
+                <th>Final</th>
+                <th>P/L</th>
+                <th>Retorno</th>
+                <th>Trades</th>
+                <th>Win rate</th>
+                <th>PF</th>
+                <th>Drawdown</th>
+                <th>Ultimo precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in history_rows %}
+                <tr>
+                  <td>{{ row.symbol }}</td>
+                  <td>{{ row.timeframe }}</td>
+                  <td>{{ row.strategy }}</td>
+                  <td>{{ row.started }}</td>
+                  <td>{{ row.closed }}</td>
+                  <td>{{ row.initial_capital }}</td>
+                  <td>{{ row.final_equity }}</td>
+                  <td class="{{ row.profit_loss_class }}">{{ row.profit_loss }}</td>
+                  <td>{{ row.return_pct }}</td>
+                  <td>{{ row.trades }}</td>
+                  <td>{{ row.win_rate }}</td>
+                  <td>{{ row.profit_factor }}</td>
+                  <td>{{ row.drawdown }}</td>
+                  <td>{{ row.last_price }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% else %}
+      <section class="empty">Todavia no hay ejecuciones IRT finalizadas.</section>
+    {% endif %}
+  </main>
+</body>
+</html>

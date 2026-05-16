@@ -7,13 +7,18 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f7fb;
+      --bg: #eef3f8;
       --panel: #ffffff;
       --text: #172033;
       --muted: #667085;
       --line: #d8dee9;
       --accent: #0f766e;
       --accent-strong: #115e59;
+      --blue: #2563eb;
+      --blue-strong: #1d4ed8;
+      --amber: #b45309;
+      --amber-strong: #92400e;
+      --soft: #f8fafc;
       --danger-bg: #fff7ed;
       --danger-line: #fed7aa;
     }
@@ -30,17 +35,21 @@
     }
 
     .shell {
-      width: min(1440px, calc(100vw - 32px));
+      width: min(1580px, calc(100vw - 32px));
       margin: 0 auto;
-      padding: 24px 0 40px;
+      padding: 18px 0 40px;
     }
 
     header {
       display: flex;
       justify-content: space-between;
       gap: 24px;
-      align-items: flex-end;
-      margin-bottom: 18px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 16px 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
     }
 
     h1 {
@@ -78,11 +87,25 @@
     }
 
     .toolbar {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
       margin-bottom: 16px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
     }
 
     form {
@@ -90,6 +113,105 @@
       grid-template-columns: repeat(5, minmax(130px, 1fr));
       gap: 12px;
       align-items: end;
+    }
+
+    .training-form {
+      display: grid;
+      grid-template-columns: minmax(420px, 5fr) minmax(520px, 7fr);
+      grid-template-areas:
+        "market capital"
+        "backtest strategy";
+      gap: 12px;
+      align-items: start;
+    }
+
+    .form-section {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(130px, 1fr));
+      gap: 12px;
+      align-items: end;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--panel);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .market-section,
+    .strategy-section {
+      grid-column: auto;
+    }
+
+    .capital-section,
+    .backtest-section {
+      grid-column: auto;
+    }
+
+    .market-section {
+      grid-area: market;
+      order: 1;
+      border-top: 3px solid var(--blue);
+    }
+
+    .capital-section {
+      grid-area: capital;
+      order: 2;
+      border-top: 3px solid #7c3aed;
+    }
+
+    .strategy-section {
+      grid-area: strategy;
+      order: 3;
+      border-top: 3px solid var(--accent);
+    }
+
+    .backtest-section {
+      grid-area: backtest;
+      order: 4;
+      border-top: 3px solid var(--amber);
+      grid-template-columns: 1fr;
+    }
+
+    .form-section h2 {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .backtest-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .backtest-actions button {
+      width: 100%;
+    }
+
+    .action-group {
+      display: grid;
+      gap: 10px;
+    }
+
+    .action-group-title {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .admin-actions {
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     label {
@@ -163,10 +285,123 @@
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
+      padding: 0 12px;
     }
 
     button:hover {
       background: var(--accent-strong);
+    }
+
+    .button-primary {
+      background: var(--blue);
+    }
+
+    .button-primary:hover {
+      background: var(--blue-strong);
+    }
+
+    .button-secondary {
+      color: var(--accent);
+      background: #ecfdf5;
+      border: 1px solid #99f6e4;
+    }
+
+    .button-secondary:hover {
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .button-warning {
+      background: var(--amber);
+    }
+
+    .button-warning:hover {
+      background: var(--amber-strong);
+    }
+
+    .button-muted {
+      color: var(--text);
+      background: var(--soft);
+      border: 1px solid var(--line);
+    }
+
+    .button-muted:hover {
+      color: #ffffff;
+      background: #475569;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 6vh 24px;
+      background: rgba(15, 23, 42, 0.42);
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(1280px, 100%);
+      max-height: 86vh;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcff;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .modal-body {
+      max-height: calc(86vh - 58px);
+      overflow: auto;
+      padding: 14px;
+    }
+
+    .modal-close {
+      width: auto;
+      height: 30px;
+      color: var(--accent);
+      background: transparent;
+      border: 1px solid #99f6e4;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .modal-close:hover {
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .summary {
@@ -174,6 +409,65 @@
       grid-template-columns: repeat(4, minmax(120px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
+    }
+
+    .summary.compact {
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin: 20px 0 10px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .drawer {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .drawer > summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .drawer > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .drawer > summary::after {
+      content: "Open";
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .drawer[open] > summary::after {
+      content: "Close";
+    }
+
+    .drawer-body {
+      padding: 0 14px 14px;
     }
 
     .metric {
@@ -242,6 +536,22 @@
       font-weight: 700;
     }
 
+    .notice {
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 12px;
+      background: #f0fdf4;
+      color: #166534;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .notice.error {
+      border-color: var(--danger-line);
+      background: var(--danger-bg);
+      color: #9a3412;
+    }
+
     .inline-action {
       display: grid;
       grid-template-columns: repeat(4, minmax(140px, 1fr)) minmax(180px, 1fr);
@@ -270,19 +580,16 @@
       overflow: hidden;
     }
 
+    .drawer .table-panel {
+      margin-top: 0;
+    }
+
     .snip-panel {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 14px;
       margin-bottom: 16px;
-    }
-
-    .master-test-form {
-      display: grid;
-      grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px);
-      gap: 12px;
-      align-items: end;
     }
 
     .snip-form {
@@ -333,6 +640,108 @@
       overflow-x: auto;
     }
 
+    .comparison-switch {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcff;
+    }
+
+    .timeframe-switch {
+      width: auto;
+      height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #ffffff;
+      font-size: 13px;
+    }
+
+    .timeframe-switch:hover,
+    .timeframe-switch.is-active {
+      border-color: #99f6e4;
+      color: var(--accent);
+      background: #ecfdf5;
+    }
+
+    .comparison-panel[hidden] {
+      display: none;
+    }
+
+    .comparison-panel-meta {
+      padding: 10px 16px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .heat-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .heat-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      border-radius: 6px;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    td.heat-awful,
+    .heat-chip.heat-awful {
+      color: #7f1d1d;
+      background: #fee2e2;
+    }
+
+    td.heat-bad,
+    .heat-chip.heat-bad {
+      color: #991b1b;
+      background: #fecaca;
+    }
+
+    td.heat-weak,
+    .heat-chip.heat-weak {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    td.heat-neutral,
+    .heat-chip.heat-neutral {
+      color: #475569;
+      background: #f1f5f9;
+    }
+
+    td.heat-good,
+    .heat-chip.heat-good {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    td.heat-great,
+    .heat-chip.heat-great {
+      color: #064e3b;
+      background: #bbf7d0;
+    }
+
+    td.heat-flag,
+    .heat-chip.heat-flag {
+      color: #ffffff;
+      background: #15803d;
+      font-weight: 800;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -363,6 +772,16 @@
       text-align: left;
     }
 
+    .table-panel td form {
+      display: inline;
+    }
+
+    .table-panel td button {
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
     @media (max-width: 900px) {
       header {
         display: block;
@@ -370,8 +789,26 @@
 
       form,
       .snip-form,
-      .summary {
+      .summary,
+      .summary.compact,
+      .form-section {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .training-form {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "market"
+          "capital"
+          "strategy"
+          "backtest";
+      }
+
+      .market-section,
+      .strategy-section,
+      .capital-section,
+      .backtest-section {
+        grid-column: 1 / -1;
       }
 
       button {
@@ -388,7 +825,10 @@
       form,
       .snip-form,
       .snip-result,
-      .summary {
+      .summary,
+      .summary.compact,
+      .form-section,
+      .backtest-actions {
         grid-template-columns: 1fr;
       }
 
@@ -403,15 +843,25 @@
     <header>
       <div>
         <h1>RTA Historical Viewer</h1>
-        <p class="subtitle">Local OHLCV dataset visualization</p>
+        <p class="subtitle">TestBack para probar estrategias contra historiales locales y de Binance</p>
       </div>
       <nav class="nav">
-        <a href="/home">System home</a>
+        <a href="/home">Home</a>
       </nav>
     </header>
 
+    <form id="strategy-upload-form" method="post" action="/strategies/upload" enctype="multipart/form-data"></form>
+    {% if upload_message %}
+      <section class="notice">{{ upload_message }}</section>
+    {% endif %}
+    {% if upload_error %}
+      <section class="notice error">{{ upload_error }}</section>
+    {% endif %}
+
     <section class="toolbar">
-      <form method="get" action="/">
+      <form id="dashboard-form" class="training-form" method="get" action="/">
+        <div class="form-section market-section">
+          <h2>Mercado y carga</h2>
         <label>
           Exchange
           <select name="exchange">
@@ -442,6 +892,7 @@
         <label>
           Timeframe
           <select name="timeframe">
+            <option value="1m" {% if timeframe == "1m" %}selected{% endif %}>1m</option>
             <option value="15m" {% if timeframe == "15m" %}selected{% endif %}>15m</option>
             <option value="30m" {% if timeframe == "30m" %}selected{% endif %}>30m</option>
             <option value="1h" {% if timeframe == "1h" %}selected{% endif %}>1h</option>
@@ -450,7 +901,7 @@
             <option value="1d" {% if timeframe == "1d" %}selected{% endif %}>1d</option>
             <option value="3d" {% if timeframe == "3d" %}selected{% endif %}>3d</option>
             <option value="1w" {% if timeframe == "1w" %}selected{% endif %}>1w</option>
-            {% if timeframe not in ["15m", "30m", "1h", "4h", "12h", "1d", "3d", "1w"] %}
+            {% if timeframe not in ["1m", "15m", "30m", "1h", "4h", "12h", "1d", "3d", "1w"] %}
               <option value="{{ timeframe }}" selected>{{ timeframe }}</option>
             {% endif %}
           </select>
@@ -459,46 +910,12 @@
           Max rows
           <input name="max_rows" type="number" min="50" max="250000" value="{{ max_rows }}">
         </label>
-        <button type="submit">Load chart</button>
-        <label>
-          Fetch since
-          <input name="fetch_since" value="{{ fetch_since }}" placeholder="2024-01-01" autocomplete="off">
-        </label>
-        <label>
-          Fetch until
-          <input name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
-        </label>
-        <label>
-          Batch limit
-          <input name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
-        </label>
-        <label>
-          Max batches
-          <input name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
-        </label>
-        <button type="submit" name="fetch_history" value="true">Download from exchange</button>
-        <button type="submit" name="fetch_all_history" value="true">Download all listed</button>
-        <button type="submit" name="compare_timeframes" value="true">Compare timeframes</button>
-        <label>
-          Validation %
-          <input name="validation_pct" type="number" min="5" max="80" step="1" value="{{ validation_pct }}">
-        </label>
         <label>
           Strategy
           <select name="strategy">
-            <option value="none" {% if strategy == "none" %}selected{% endif %}>None</option>
-            <option value="sma_crossover" {% if strategy == "sma_crossover" %}selected{% endif %}>SMA 20/50 Crossover</option>
-            <option value="ema_crossover" {% if strategy == "ema_crossover" %}selected{% endif %}>EMA 20/50 Crossover</option>
-            <option value="rsi_mean_reversion" {% if strategy == "rsi_mean_reversion" %}selected{% endif %}>RSI 14 Mean Reversion</option>
-            <option value="bollinger_mean_reversion" {% if strategy == "bollinger_mean_reversion" %}selected{% endif %}>Bollinger Mean Reversion</option>
-            <option value="bollinger_trend_reversion" {% if strategy == "bollinger_trend_reversion" %}selected{% endif %}>Bollinger Trend Filtered</option>
-            <option value="ema_trend_capture" {% if strategy == "ema_trend_capture" %}selected{% endif %}>EMA Trend Capture 80/300</option>
-            <option value="ema_donchian_trend" {% if strategy == "ema_donchian_trend" %}selected{% endif %}>EMA Donchian Trend 50/200</option>
-            <option value="adaptive_trend_guard" {% if strategy == "adaptive_trend_guard" %}selected{% endif %}>Adaptive Trend Guard 80/300</option>
-            <option value="bull_trend_rider" {% if strategy == "bull_trend_rider" %}selected{% endif %}>Bull Trend Rider 80/300</option>
-            <option value="bear_trend_rider" {% if strategy == "bear_trend_rider" %}selected{% endif %}>Bear Trend Rider 80/300</option>
-            <option value="panic_dip_buyer" {% if strategy == "panic_dip_buyer" %}selected{% endif %}>Panic Dip Buyer</option>
-            <option value="ultimate_hybrid" {% if strategy == "ultimate_hybrid" %}selected{% endif %}>Ultimate Hybrid System</option>
+            {% for option in strategy_options %}
+              <option value="{{ option.value }}" {% if strategy == option.value %}selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
           </select>
         </label>
         <label>
@@ -508,6 +925,14 @@
         <label>
           End date
           <input name="end_date" value="{{ end_date }}" placeholder="2026-05-14" autocomplete="off">
+        </label>
+        <button class="button-primary" type="submit" name="run_analysis" value="true">Load chart</button>
+        </div>
+        <div class="form-section strategy-section">
+          <h2>Periodo e indicadores</h2>
+        <label>
+          Validation %
+          <input name="validation_pct" type="number" min="5" max="80" step="1" value="{{ validation_pct }}">
         </label>
         <label>
           Fast period
@@ -537,6 +962,9 @@
           BB std dev
           <input name="bollinger_std" type="number" min="0.1" max="10" step="0.1" value="{{ bollinger_std }}">
         </label>
+        </div>
+        <div class="form-section capital-section">
+          <h2>Capital y vista</h2>
         <label>
           Fee bps
           <input name="fee_bps" type="number" min="0" max="1000" step="0.01" value="{{ fee_bps }}">
@@ -576,6 +1004,40 @@
             EMA 200
           </label>
         </div>
+        </div>
+        <div class="form-section backtest-section">
+          <h2>Configuracion Backtest</h2>
+          <div class="action-group">
+            <span class="action-group-title">Ejecutar backtests</span>
+            <div class="backtest-actions">
+            <button class="button-primary" type="submit" name="compare_strategies" value="true">Compare current TF</button>
+            <button class="button-secondary" type="submit" name="walk_forward" value="true">Walk-forward</button>
+            <button class="button-secondary" type="submit" name="compare_timeframes" value="true">Compare timeframes</button>
+            <button
+              class="button-warning"
+              type="submit"
+              name="strategy_compare_scope"
+              value="all"
+              data-confirm-long-backtest="true"
+            >
+              Compare all TFs
+            </button>
+            <button class="button-muted" type="submit" name="save_result" value="true">Save result</button>
+            </div>
+          </div>
+          <div class="action-group admin-actions">
+            <span class="action-group-title">Administracion</span>
+            <div class="backtest-actions">
+            <button class="button-muted" type="submit" name="fetch_all_history" value="true">Download all listed</button>
+            <button class="button-muted" type="button" data-open-modal="download-config-modal">Download config</button>
+            <input id="strategy-file-input" class="sr-only" form="strategy-upload-form" name="strategy_file" type="file" accept=".py">
+            <button class="button-secondary" id="strategy-upload-button" type="button">Agregar estrategia .py</button>
+            <button class="button-muted" type="button" data-open-modal="dataset-status-modal">Dataset status</button>
+            <button class="button-muted" type="button" data-open-modal="saved-results-modal">Saved results</button>
+            <button class="button-muted" type="button" data-open-modal="custom-strategies-modal">Custom strategies</button>
+            </div>
+          </div>
+        </div>
       </form>
     </section>
 
@@ -593,6 +1055,9 @@
           </ul>
         {% endif %}
       </section>
+    {% endif %}
+    {% if saved_result_message %}
+      <section class="notice">{{ saved_result_message }}</section>
     {% endif %}
     {% if data_error %}
       <section class="empty" style="margin-bottom: 16px;">
@@ -648,156 +1113,481 @@
       </section>
     {% endif %}
 
-    <section class="snip-panel">
-      <form class="master-test-form" method="get" action="/">
-        <label>
-          Probar Masters
-          <select name="master_config">
-            <option value="">Select saved master</option>
-            {% for master in saved_masters %}
-              <option value="{{ master.name }}" {% if master_config == master.name %}selected{% endif %}>{{ master.name }} · {{ master.symbol }} · {{ master.main_timeframe }}</option>
-            {% endfor %}
-          </select>
-        </label>
-        <button type="submit">Load master</button>
-      </form>
-      {% if selected_master_config %}
-        <p class="subtitle" style="margin-top: 10px;">
-          Loaded {{ selected_master_config.name }}:
-          {{ selected_master_config.symbol }} · {{ selected_master_config.main_timeframe }} · {{ selected_master_config.main_strategy }}
-        </p>
-      {% endif %}
-    </section>
-
-    <section class="snip-panel">
-      <form class="snip-form" method="get" action="/">
-        <input type="hidden" name="exchange" value="{{ exchange }}">
-        <input type="hidden" name="symbol" value="{{ symbol }}">
-        <input type="hidden" name="timeframe" value="{{ timeframe }}">
-        <input type="hidden" name="max_rows" value="{{ max_rows }}">
-        <input type="hidden" name="fetch_since" value="{{ fetch_since }}">
-        <input type="hidden" name="fetch_until" value="{{ fetch_until }}">
-        <input type="hidden" name="fetch_batch_limit" value="{{ fetch_batch_limit }}">
-        <input type="hidden" name="fetch_max_batches" value="{{ fetch_max_batches }}">
-        <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
-        <input type="hidden" name="strategy" value="{{ strategy }}">
-        <input type="hidden" name="start_date" value="{{ start_date }}">
-        <input type="hidden" name="end_date" value="{{ end_date }}">
-        <input type="hidden" name="fast_period" value="{{ fast_period }}">
-        <input type="hidden" name="slow_period" value="{{ slow_period }}">
-        <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
-        <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
-        <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
-        <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
-        <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
-        <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
-        <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
-        <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
-        <input type="hidden" name="position_mode" value="{{ position_mode }}">
-        <label>
-          SnipHedge Polymarket URL / slug
-          <input name="snip_url" value="{{ snip_url }}" autocomplete="off">
-        </label>
-        <label>
-          Up bid trigger
-          <input name="snip_trigger_up_bid" type="number" min="0" max="1" step="0.01" value="{{ snip_trigger_up_bid }}">
-        </label>
-        <label>
-          Down bid trigger
-          <input name="snip_trigger_down_bid" type="number" min="0" max="1" step="0.01" value="{{ snip_trigger_down_bid }}">
-        </label>
-        <label>
-          Up limit
-          <input name="snip_limit_up" type="number" min="0" max="1" step="0.01" value="{{ snip_limit_up }}">
-        </label>
-        <label>
-          Down limit
-          <input name="snip_limit_down" type="number" min="0" max="1" step="0.01" value="{{ snip_limit_down }}">
-        </label>
-        <button type="submit">Check hedge</button>
-      </form>
-      {% if snip_error %}
-        <section class="empty" style="margin-top: 14px;">
-          {{ snip_error }}
-          <form class="inline-action" method="get" action="/">
-            <input type="hidden" name="exchange" value="{{ exchange }}">
-            <input type="hidden" name="symbol" value="{{ symbol }}">
-            <input type="hidden" name="timeframe" value="{{ timeframe }}">
-            <input type="hidden" name="max_rows" value="{{ max_rows }}">
-            <input type="hidden" name="strategy" value="{{ strategy }}">
-            <input type="hidden" name="start_date" value="{{ start_date }}">
-            <input type="hidden" name="end_date" value="{{ end_date }}">
-            <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
-            <input type="hidden" name="fast_period" value="{{ fast_period }}">
-            <input type="hidden" name="slow_period" value="{{ slow_period }}">
-            <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
-            <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
-            <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
-            <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
-            <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
-            <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
-            <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
-            <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
-            <input type="hidden" name="position_mode" value="{{ position_mode }}">
-            <label>
-              Fetch since
-              <input name="fetch_since" value="{{ fetch_since }}" autocomplete="off">
-            </label>
-            <label>
-              Fetch until
-              <input name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
-            </label>
-            <label>
-              Batch limit
-              <input name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
-            </label>
-            <label>
-              Max batches
-              <input name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
-            </label>
-            <button type="submit" name="fetch_history" value="true">Download history</button>
-          </form>
-        </section>
-      {% endif %}
-      {% if snip_preview %}
-        <div class="snip-result">
-          <div class="metric">
-            <span>Event</span>
-            <strong>{{ snip_preview.title }}</strong>
-          </div>
-          <div class="metric">
-            <span>Slug</span>
-            <strong>{{ snip_preview.slug }}</strong>
-          </div>
-          <div class="metric">
-            <span>Interval</span>
-            <strong>{{ snip_preview.interval }}</strong>
-          </div>
-          <div class="metric {% if snip_preview.condition == 'YES' %}status-ok{% else %}status-warn{% endif %}">
-            <span>Condition</span>
-            <strong>{{ snip_preview.condition }}</strong>
-          </div>
-          <div class="metric">
-            <span>{{ snip_preview.up_label }} bid / ask</span>
-            <strong>{{ snip_preview.up_bid }} / {{ snip_preview.up_ask }}</strong>
-          </div>
-          <div class="metric">
-            <span>{{ snip_preview.down_label }} bid / ask</span>
-            <strong>{{ snip_preview.down_bid }} / {{ snip_preview.down_ask }}</strong>
-          </div>
-          <div class="metric">
-            <span>Configured margin</span>
-            <strong>{{ snip_preview.guaranteed_margin }}</strong>
-          </div>
-          <div class="metric">
-            <span>Mode</span>
-            <strong>Preview only</strong>
-          </div>
+    {% if walk_forward_results %}
+      <section class="table-panel">
+        <div class="table-header">
+          <h2>Walk-forward Test</h2>
+          <span>{{ symbol }} - {{ timeframe }} - {{ strategy }} - 2 year windows</span>
         </div>
-      {% endif %}
-    </section>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Window</th>
+                <th>Status</th>
+                <th>Rows</th>
+                <th>Strategy gain</th>
+                <th>Buy & hold</th>
+                <th>Alpha</th>
+                <th>Drawdown</th>
+                <th>Trades</th>
+                <th>Profit factor</th>
+                <th>Exposure</th>
+                <th>Avg trade days</th>
+                <th>Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in walk_forward_results %}
+                <tr>
+                  <td>{{ row.window }}</td>
+                  <td>{{ row.status }}</td>
+                  <td>{{ row.rows }}</td>
+                  <td>{{ row.strategy_gain }}</td>
+                  <td>{{ row.buy_hold }}</td>
+                  <td>{{ row.alpha }}</td>
+                  <td>{{ row.drawdown }}</td>
+                  <td>{{ row.trades }}</td>
+                  <td>{{ row.profit_factor }}</td>
+                  <td>{{ row.exposure }}</td>
+                  <td>{{ row.avg_trade_days }}</td>
+                  <td>{{ row.verdict }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endif %}
 
-    <section class="summary">
+    {% if strategy_compare_results %}
+      {% set strategy_compare_grouped = true %}
+      <section class="table-panel">
+        <div class="table-header">
+          <h2>Strategy Comparison</h2>
+          <span>{{ symbol }} - {% if strategy_compare_scope == "all" %}all timeframes{% else %}{{ timeframe }}{% endif %} - {{ start_date or "all" }} to {{ end_date or "latest" }}</span>
+        </div>
+        <div class="heat-legend" aria-label="Comparison color guide">
+          <span class="heat-chip heat-awful">Malísima</span>
+          <span class="heat-chip heat-bad">Mala</span>
+          <span class="heat-chip heat-weak">Débil</span>
+          <span class="heat-chip heat-neutral">Neutra</span>
+          <span class="heat-chip heat-good">Buena</span>
+          <span class="heat-chip heat-great">Muy buena</span>
+          <span class="heat-chip heat-flag">Estrategia hecha</span>
+        </div>
+        {% if strategy_compare_summary %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Strategy</th>
+                  <th>Best TF</th>
+                  <th>Tested TFs</th>
+                  <th>Promising TFs</th>
+                  <th>Avg validation alpha</th>
+                  <th>Worst drawdown</th>
+                  <th>Avg exposure</th>
+                  <th>Best validation gain</th>
+                  <th>Best validation PF</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in strategy_compare_summary %}
+                  <tr>
+                    <td>{{ row.strategy }}</td>
+                    <td>{{ row.best_timeframe }}</td>
+                    <td>{{ row.tested }}</td>
+                    <td>{{ row.promising }}</td>
+                    <td>{{ row.avg_validation_alpha }}</td>
+                    <td>{{ row.worst_drawdown }}</td>
+                    <td>{{ row.avg_exposure }}</td>
+                    <td>{{ row.best_validation_gain }}</td>
+                    <td>{{ row.best_validation_pf }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+        <div class="comparison-switch" role="tablist" aria-label="Strategy comparison timeframes">
+          {% for group in strategy_compare_results %}
+            <button
+              class="timeframe-switch {% if group.timeframe == timeframe %}is-active{% endif %}"
+              type="button"
+              data-target="strategy-comparison-{{ group.timeframe }}"
+              role="tab"
+              aria-selected="{% if group.timeframe == timeframe %}true{% else %}false{% endif %}"
+            >
+              {{ group.timeframe }}
+            </button>
+          {% endfor %}
+        </div>
+        {% for group in strategy_compare_results %}
+          <div
+            id="strategy-comparison-{{ group.timeframe }}"
+            class="comparison-panel"
+            role="tabpanel"
+            {% if group.timeframe != timeframe %}hidden{% endif %}
+          >
+            <div class="comparison-panel-meta">
+              {{ group.timeframe }} - {{ group.status }} - {{ group.rows }} rows - {{ group.from }} to {{ group.to }}
+            </div>
+            {% if group.strategies %}
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Strategy</th>
+                      <th>Status</th>
+                      <th>Trades</th>
+                      <th>Strategy gain</th>
+                      <th>Buy & hold</th>
+                      <th>Alpha</th>
+                      <th>Drawdown</th>
+                      <th>Profit factor</th>
+                      <th>Exposure</th>
+                      <th>Avg trade days</th>
+                      <th>Validation gain</th>
+                      <th>Validation alpha</th>
+                      <th>Validation PF</th>
+                      <th>Verdict</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in group.strategies %}
+                      <tr>
+                        <td>{{ row.strategy }}</td>
+                        <td>{{ row.status }}</td>
+                        <td>{{ row.trades }}</td>
+                        <td>{{ row.strategy_gain }}</td>
+                        <td>{{ row.buy_hold }}</td>
+                        <td>{{ row.alpha }}</td>
+                        <td>{{ row.drawdown }}</td>
+                        <td>{{ row.profit_factor }}</td>
+                        <td>{{ row.exposure }}</td>
+                        <td>{{ row.avg_trade_days }}</td>
+                        <td>{{ row.validation_gain }}</td>
+                        <td>{{ row.validation_alpha }}</td>
+                        <td>{{ row.validation_profit_factor }}</td>
+                        <td>{{ row.verdict }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <section class="empty">No comparison data for {{ symbol }} {{ group.timeframe }}.</section>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </section>
+      {% if false %}
+      <section class="table-panel">
+        <div class="table-header">
+          <h2>Strategy Comparison</h2>
+          <span>{{ symbol }} · {{ timeframe }} · {{ start_date or "all" }} to {{ end_date or "latest" }}</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Strategy</th>
+                <th>Status</th>
+                <th>Trades</th>
+                <th>Strategy gain</th>
+                <th>Buy & hold</th>
+                <th>Alpha</th>
+                <th>Drawdown</th>
+                <th>Profit factor</th>
+                <th>Validation gain</th>
+                <th>Validation alpha</th>
+                <th>Validation PF</th>
+                <th>Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in strategy_compare_results %}
+                <tr>
+                  <td>{{ row.strategy }}</td>
+                  <td>{{ row.status }}</td>
+                  <td>{{ row.trades }}</td>
+                  <td>{{ row.strategy_gain }}</td>
+                  <td>{{ row.buy_hold }}</td>
+                  <td>{{ row.alpha }}</td>
+                  <td>{{ row.drawdown }}</td>
+                  <td>{{ row.profit_factor }}</td>
+                  <td>{{ row.validation_gain }}</td>
+                  <td>{{ row.validation_alpha }}</td>
+                  <td>{{ row.validation_profit_factor }}</td>
+                  <td>{{ row.verdict }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+    {% endif %}
+
+    <div id="download-config-modal" class="modal-backdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="download-config-title">
+        <div class="modal-head">
+          <h2 id="download-config-title">Configuracion descarga</h2>
+          <button class="modal-close" type="button" data-close-modal>Close</button>
+        </div>
+        <div class="modal-body">
+          <section class="table-panel">
+            <div class="table-header">
+              <h2>Download from exchange</h2>
+              <span>Choose exact dataset target</span>
+            </div>
+            <div class="snip-form" style="padding: 14px;">
+              <label>
+                Exchange
+                <select form="dashboard-form" name="exchange">
+                  <option value="binance" {% if exchange == "binance" %}selected{% endif %}>binance</option>
+                  <option value="coinbase" {% if exchange == "coinbase" %}selected{% endif %}>coinbase</option>
+                  <option value="kraken" {% if exchange == "kraken" %}selected{% endif %}>kraken</option>
+                  <option value="okx" {% if exchange == "okx" %}selected{% endif %}>okx</option>
+                  <option value="bybit" {% if exchange == "bybit" %}selected{% endif %}>bybit</option>
+                  {% if exchange not in ["binance", "coinbase", "kraken", "okx", "bybit"] %}
+                    <option value="{{ exchange }}" selected>{{ exchange }}</option>
+                  {% endif %}
+                </select>
+              </label>
+              <label>
+                Symbol
+                <select form="dashboard-form" name="symbol">
+                  <option value="BTC/USDT" {% if symbol == "BTC/USDT" %}selected{% endif %}>BTC/USDT</option>
+                  <option value="ETH/USDT" {% if symbol == "ETH/USDT" %}selected{% endif %}>ETH/USDT</option>
+                  <option value="SOL/USDT" {% if symbol == "SOL/USDT" %}selected{% endif %}>SOL/USDT</option>
+                  <option value="BNB/USDT" {% if symbol == "BNB/USDT" %}selected{% endif %}>BNB/USDT</option>
+                  <option value="XRP/USDT" {% if symbol == "XRP/USDT" %}selected{% endif %}>XRP/USDT</option>
+                  <option value="ADA/USDT" {% if symbol == "ADA/USDT" %}selected{% endif %}>ADA/USDT</option>
+                  {% if symbol not in ["BTC/USDT", "ETH/USDT", "SOL/USDT", "BNB/USDT", "XRP/USDT", "ADA/USDT"] %}
+                    <option value="{{ symbol }}" selected>{{ symbol }}</option>
+                  {% endif %}
+                </select>
+              </label>
+              <label>
+                Timeframe to download
+                <select form="dashboard-form" name="timeframe">
+                  <option value="1m" {% if timeframe == "1m" %}selected{% endif %}>1m</option>
+                  <option value="15m" {% if timeframe == "15m" %}selected{% endif %}>15m</option>
+                  <option value="30m" {% if timeframe == "30m" %}selected{% endif %}>30m</option>
+                  <option value="1h" {% if timeframe == "1h" %}selected{% endif %}>1h</option>
+                  <option value="4h" {% if timeframe == "4h" %}selected{% endif %}>4h</option>
+                  <option value="12h" {% if timeframe == "12h" %}selected{% endif %}>12h</option>
+                  <option value="1d" {% if timeframe == "1d" %}selected{% endif %}>1d</option>
+                  <option value="3d" {% if timeframe == "3d" %}selected{% endif %}>3d</option>
+                  <option value="1w" {% if timeframe == "1w" %}selected{% endif %}>1w</option>
+                  {% if timeframe not in ["1m", "15m", "30m", "1h", "4h", "12h", "1d", "3d", "1w"] %}
+                    <option value="{{ timeframe }}" selected>{{ timeframe }}</option>
+                  {% endif %}
+                </select>
+              </label>
+              <label>
+                Fetch since
+                <input form="dashboard-form" name="fetch_since" value="{{ fetch_since }}" placeholder="2024-01-01" autocomplete="off">
+              </label>
+              <label>
+                Fetch until
+                <input form="dashboard-form" name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
+              </label>
+              <label>
+                Batch limit
+                <input form="dashboard-form" name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
+              </label>
+              <label>
+                Max batches
+                <input form="dashboard-form" name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
+              </label>
+              <button class="button-secondary" form="dashboard-form" type="submit" name="fetch_history" value="true">Download from exchange</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div id="dataset-status-modal" class="modal-backdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="dataset-status-title">
+        <div class="modal-head">
+          <h2 id="dataset-status-title">Dataset Status</h2>
+          <button class="modal-close" type="button" data-close-modal>Close</button>
+        </div>
+        <div class="modal-body">
+          <section class="table-panel">
+            <div class="table-header">
+              <h2>Dataset Status</h2>
+              <span>{{ exchange }} local CSV coverage</span>
+            </div>
+            {% if dataset_status %}
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Coverage</th>
+                    <th>Total rows</th>
+                    {% for item in dataset_status[0].timeframes %}
+                      <th>{{ item.timeframe }}</th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for row in dataset_status %}
+                    <tr>
+                      <td>{{ row.symbol }}</td>
+                      <td>{{ row.available }}/{{ row.total }}</td>
+                      <td>{{ row.total_rows }}</td>
+                      {% for item in row.timeframes %}
+                        <td title="{{ item.status }}">{{ item.rows }}</td>
+                      {% endfor %}
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+              <section class="empty">No dataset status available.</section>
+            {% endif %}
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div id="saved-results-modal" class="modal-backdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="saved-results-title">
+        <div class="modal-head">
+          <h2 id="saved-results-title">Saved backtest results</h2>
+          <button class="modal-close" type="button" data-close-modal>Close</button>
+        </div>
+        <div class="modal-body">
+          <section class="table-panel">
+            <div class="table-header">
+              <h2>Saved backtest results</h2>
+              <span>Last {{ saved_results | length }} snapshots</span>
+            </div>
+            {% if saved_results %}
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Saved</th>
+                      <th>Symbol</th>
+                      <th>TF</th>
+                      <th>Strategy</th>
+                      <th>Range</th>
+                      <th>Gain</th>
+                      <th>Buy & hold</th>
+                      <th>Alpha</th>
+                      <th>Drawdown</th>
+                      <th>Trades</th>
+                      <th>PF</th>
+                      <th>Validation</th>
+                      <th>Verdict</th>
+                      <th>Open</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in saved_results %}
+                      <tr>
+                        <td>{{ item.created_at }}</td>
+                        <td>{{ item.symbol }}</td>
+                        <td>{{ item.timeframe }}</td>
+                        <td>{{ item.strategy }}</td>
+                        <td>{{ item.date_range }}</td>
+                        <td>{{ item.strategy_gain }}</td>
+                        <td>{{ item.buy_hold }}</td>
+                        <td>{{ item.alpha }}</td>
+                        <td>{{ item.drawdown }}</td>
+                        <td>{{ item.trades }}</td>
+                        <td>{{ item.profit_factor }}</td>
+                        <td>{{ item.validation_gain }}</td>
+                        <td>{{ item.validation_verdict }}</td>
+                        <td>
+                          <form method="get" action="/">
+                            <input type="hidden" name="exchange" value="{{ item.exchange or exchange }}">
+                            <input type="hidden" name="symbol" value="{{ item.symbol }}">
+                            <input type="hidden" name="timeframe" value="{{ item.timeframe }}">
+                            <input type="hidden" name="strategy" value="{{ item.strategy_key or strategy }}">
+                            <input type="hidden" name="start_date" value="{{ item.start_date or '' }}">
+                            <input type="hidden" name="end_date" value="{{ item.end_date or '' }}">
+                            <input type="hidden" name="initial_capital" value="{{ item.initial_capital or initial_capital }}">
+                            <input type="hidden" name="position_mode" value="{{ item.position_mode or position_mode }}">
+                            <input type="hidden" name="fee_bps" value="{{ item.fee_bps or fee_bps }}">
+                            <input type="hidden" name="slippage_bps" value="{{ item.slippage_bps or slippage_bps }}">
+                            <input type="hidden" name="run_analysis" value="true">
+                            <button class="button-primary" type="submit">Open</button>
+                          </form>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <section class="empty">No saved backtest results yet.</section>
+            {% endif %}
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div id="custom-strategies-modal" class="modal-backdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="custom-strategies-title">
+        <div class="modal-head">
+          <h2 id="custom-strategies-title">Custom strategies</h2>
+          <button class="modal-close" type="button" data-close-modal>Close</button>
+        </div>
+        <div class="modal-body">
+          <section class="table-panel">
+            <div class="table-header">
+              <h2>Custom strategies</h2>
+              <span>{{ custom_strategies | length }} uploaded</span>
+            </div>
+            {% if custom_strategies %}
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Strategy</th>
+                      <th>Key</th>
+                      <th>Path</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in custom_strategies %}
+                      <tr>
+                        <td>{{ item.label }}</td>
+                        <td>{{ item.key }}</td>
+                        <td>{{ item.path }}</td>
+                        <td>
+                          <form method="post" action="/strategies/delete" onsubmit="return confirm('Delete {{ item.label }}?');">
+                            <input type="hidden" name="strategy_key" value="{{ item.key }}">
+                            <button class="button-warning" type="submit">Delete</button>
+                          </form>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <section class="empty">No custom strategies uploaded yet.</section>
+            {% endif %}
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="section-title">
+      <h2>Resultado principal</h2>
+      <span class="meta">Lo primero que hay que leer antes de abrir detalles</span>
+    </div>
+    <section class="summary compact">
       <div class="metric">
         <span>Rows</span>
         <strong>{{ summary.rows }}</strong>
@@ -862,6 +1652,14 @@
         <span>Return / drawdown</span>
         <strong>{{ summary.return_drawdown_ratio }}</strong>
       </div>
+        </section>
+      </div>
+    </details>
+
+    <details class="drawer">
+      <summary>Diagnostico y validacion</summary>
+      <div class="drawer-body">
+        <section class="summary">
       <div class="metric">
         <span>Max drawdown</span>
         <strong>{{ summary.max_drawdown_pct }}</strong>
@@ -958,7 +1756,9 @@
         <span>Validation verdict</span>
         <strong>{{ summary.validation_verdict }}</strong>
       </div>
-    </section>
+        </section>
+      </div>
+    </details>
 
     {% if chart_html %}
       <section class="chart">
@@ -986,6 +1786,9 @@
                   <th>Return</th>
                   <th>P/L USD</th>
                   <th>Equity after</th>
+                  <th>Module</th>
+                  <th>Allocation</th>
+                  <th>Reason</th>
                 </tr>
               </thead>
               <tbody>
@@ -998,6 +1801,9 @@
                     <td>{{ trade.return_pct }}</td>
                     <td>{{ trade.pl_usd }}</td>
                     <td>{{ trade.equity_after }}</td>
+                    <td>{{ trade.module }}</td>
+                    <td>{{ trade.allocation_pct }}</td>
+                    <td>{{ trade.reason }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -1195,6 +2001,193 @@
       if (metricHelp[key]) {
         label.title = metricHelp[key];
       }
+    });
+
+    const strategyUploadButton = document.getElementById("strategy-upload-button");
+    const strategyFileInput = document.getElementById("strategy-file-input");
+    const strategyUploadForm = document.getElementById("strategy-upload-form");
+    if (strategyUploadButton && strategyFileInput && strategyUploadForm) {
+      strategyUploadButton.addEventListener("click", () => strategyFileInput.click());
+      strategyFileInput.addEventListener("change", () => {
+        if (strategyFileInput.files.length > 0) {
+          strategyUploadForm.submit();
+        }
+      });
+    }
+
+    const comparisonSwitches = document.querySelectorAll(".timeframe-switch");
+    const comparisonPanels = document.querySelectorAll(".comparison-panel");
+    comparisonSwitches.forEach((button) => {
+      button.addEventListener("click", () => {
+        const targetId = button.dataset.target;
+        comparisonSwitches.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("is-active", isActive);
+          item.setAttribute("aria-selected", String(isActive));
+        });
+        comparisonPanels.forEach((panel) => {
+          panel.hidden = panel.id !== targetId;
+        });
+      });
+    });
+
+    document.querySelectorAll("[data-confirm-long-backtest='true']").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        const confirmed = confirm(
+          "This comparison can take a long time because it runs every strategy across every timeframe. Continue?"
+        );
+        if (!confirmed) {
+          event.preventDefault();
+        }
+      });
+    });
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.hidden = false;
+      modal.classList.add("is-open");
+    }
+
+    function closeModal(modal) {
+      if (!modal) return;
+      modal.classList.remove("is-open");
+      modal.hidden = true;
+    }
+
+    document.querySelectorAll("[data-open-modal]").forEach((button) => {
+      button.addEventListener("click", () => openModal(button.dataset.openModal));
+    });
+
+    document.querySelectorAll("[data-close-modal]").forEach((button) => {
+      button.addEventListener("click", () => closeModal(button.closest(".modal-backdrop")));
+    });
+
+    document.querySelectorAll(".modal-backdrop").forEach((backdrop) => {
+      backdrop.addEventListener("click", (event) => {
+        if (event.target === backdrop) {
+          closeModal(backdrop);
+        }
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        document.querySelectorAll(".modal-backdrop.is-open").forEach(closeModal);
+      }
+    });
+
+    const heatClasses = [
+      "heat-awful",
+      "heat-bad",
+      "heat-weak",
+      "heat-neutral",
+      "heat-good",
+      "heat-great",
+      "heat-flag",
+    ];
+
+    function parseMetricValue(text) {
+      const clean = text.trim().toLowerCase();
+      if (!clean || clean === "-" || clean === "nan") {
+        return null;
+      }
+      if (clean === "inf" || clean === "infinity") {
+        return Infinity;
+      }
+      const value = Number.parseFloat(clean.replace("%", "").replace(",", ""));
+      return Number.isFinite(value) ? value : null;
+    }
+
+    function classifyPositive(value) {
+      if (value === null) return "";
+      if (value === Infinity) return "heat-flag";
+      if (value <= -25) return "heat-awful";
+      if (value < 0) return "heat-bad";
+      if (value < 3) return "heat-weak";
+      if (value < 10) return "heat-good";
+      if (value < 25) return "heat-great";
+      return "heat-flag";
+    }
+
+    function classifyDrawdown(value) {
+      if (value === null) return "";
+      if (value <= -70) return "heat-awful";
+      if (value <= -45) return "heat-bad";
+      if (value <= -25) return "heat-weak";
+      if (value <= -10) return "heat-neutral";
+      if (value < 0) return "heat-good";
+      return "heat-great";
+    }
+
+    function classifyProfitFactor(value) {
+      if (value === null) return "";
+      if (value === Infinity) return "heat-flag";
+      if (value <= 0) return "heat-neutral";
+      if (value < 0.75) return "heat-bad";
+      if (value < 1) return "heat-weak";
+      if (value < 1.5) return "heat-good";
+      if (value < 2.5) return "heat-great";
+      return "heat-flag";
+    }
+
+    function classifyPromising(value) {
+      if (value === null) return "";
+      if (value <= 0) return "heat-neutral";
+      if (value === 1) return "heat-good";
+      if (value <= 3) return "heat-great";
+      return "heat-flag";
+    }
+
+    function classifyExposure(value) {
+      if (value === null) return "";
+      if (value <= 5) return "heat-neutral";
+      if (value <= 35) return "heat-good";
+      if (value <= 65) return "heat-weak";
+      if (value <= 90) return "heat-bad";
+      return "heat-awful";
+    }
+
+    function classifyVerdict(text) {
+      const clean = text.trim().toLowerCase();
+      if (clean === "promising") return "heat-great";
+      if (clean === "defensive") return "heat-neutral";
+      if (clean === "weak validation") return "heat-bad";
+      if (clean === "no strategy" || clean === "no data") return "heat-neutral";
+      return "";
+    }
+
+    function applyHeatClass(cell, className) {
+      if (!className) return;
+      cell.classList.remove(...heatClasses);
+      cell.classList.add(className);
+    }
+
+    document.querySelectorAll(".table-panel table").forEach((table) => {
+      const headers = Array.from(table.querySelectorAll("thead th")).map((header) =>
+        header.textContent.trim().toLowerCase()
+      );
+      table.querySelectorAll("tbody tr").forEach((row) => {
+        Array.from(row.children).forEach((cell, index) => {
+          const header = headers[index] || "";
+          const value = parseMetricValue(cell.textContent);
+          let className = "";
+          if (header.includes("drawdown")) {
+            className = classifyDrawdown(value);
+          } else if (header.includes("profit factor") || header === "pf" || header.includes("validation pf")) {
+            className = classifyProfitFactor(value);
+          } else if (header.includes("promising")) {
+            className = classifyPromising(value);
+          } else if (header.includes("exposure")) {
+            className = classifyExposure(value);
+          } else if (header.includes("gain") || header.includes("alpha") || header.includes("return")) {
+            className = classifyPositive(value);
+          } else if (header.includes("verdict")) {
+            className = classifyVerdict(cell.textContent);
+          }
+          applyHeatClass(cell, className);
+        });
+      });
     });
   </script>
 </body>

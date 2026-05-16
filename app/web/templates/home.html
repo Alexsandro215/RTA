@@ -3,19 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RTA System Home</title>
+  <meta http-equiv="refresh" content="60">
+  <title>RTA Home</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f7fb;
+      --bg: #eef3f8;
       --panel: #ffffff;
       --text: #172033;
       --muted: #667085;
-      --line: #d8dee9;
+      --line: #d9e2ee;
       --accent: #0f766e;
       --accent-strong: #115e59;
-      --warn: #9a3412;
-      --soft: #f8fafc;
+      --soft: #f7fafc;
+      --blue: #2563eb;
+      --ink: #0f172a;
+      --success-bg: #f0fdf4;
+      --success-line: #bbf7d0;
+      --danger-bg: #fff7ed;
+      --danger-line: #fed7aa;
     }
 
     * {
@@ -24,7 +31,9 @@
 
     body {
       margin: 0;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(15, 118, 110, 0.11), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 42%, #eef3f8 100%);
       color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
     }
@@ -51,7 +60,7 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 34px;
       letter-spacing: 0;
     }
 
@@ -60,14 +69,15 @@
       letter-spacing: 0;
     }
 
-    h3 {
-      font-size: 14px;
-      letter-spacing: 0;
+    .subtitle,
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
     }
 
     .subtitle {
       margin-top: 6px;
-      color: var(--muted);
       font-size: 14px;
     }
 
@@ -75,6 +85,25 @@
       display: flex;
       gap: 10px;
       align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .refresh-pill {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    form {
+      margin: 0;
     }
 
     a,
@@ -94,6 +123,12 @@
       cursor: pointer;
     }
 
+    i[data-lucide] {
+      width: 16px;
+      height: 16px;
+      margin-right: 7px;
+    }
+
     a.secondary {
       color: var(--accent);
       background: #ecfdf5;
@@ -106,254 +141,293 @@
       color: #ffffff;
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: 360px minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px;
-    }
-
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .add-form,
-    .config-form {
-      display: grid;
-      gap: 12px;
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    input,
-    select {
-      width: 100%;
-      height: 38px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 0 10px;
-      color: var(--text);
-      background: #ffffff;
-      font-size: 14px;
-    }
-
-    .master-list {
-      display: grid;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .master {
-      display: grid;
-      gap: 8px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
-      background: #ffffff;
-    }
-
-    .master.selected {
-      border-color: #0f766e;
-      background: #f0fdfa;
-    }
-
-    .master-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .master strong {
-      font-size: 16px;
-    }
-
-    .meta {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .select-master {
-      height: 32px;
-      padding: 0 10px;
-      font-size: 12px;
-    }
-
-    .workspace {
-      display: grid;
-      gap: 16px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .checks {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(180px, 1fr));
-      gap: 10px;
-    }
-
-    .strategy-card {
-      display: grid;
-      gap: 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
-      background: #ffffff;
-      min-height: 180px;
-    }
-
-    .strategy-card strong {
-      font-size: 13px;
-    }
-
-    .allocation {
-      display: grid;
-      grid-template-columns: 1fr 120px;
-      gap: 10px;
-      align-items: end;
-    }
-
     .notice {
-      border: 1px solid #bbf7d0;
+      border: 1px solid var(--success-line);
       border-radius: 8px;
       padding: 12px;
-      background: #f0fdf4;
+      background: var(--success-bg);
       color: #166534;
       font-weight: 700;
       margin-bottom: 16px;
     }
 
-    .saved-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+    .notice.error {
+      border-color: var(--danger-line);
+      background: var(--danger-bg);
+      color: #9a3412;
     }
 
-    .saved-master {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
-      background: var(--soft);
-    }
-
-    .toggle {
+    .section-head {
       display: flex;
-      min-height: 58px;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 16px;
       align-items: center;
+      margin: 24px 0 14px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .strategy-card {
+      height: auto;
+      display: grid;
+      gap: 14px;
+      min-height: 0;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 14px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--text);
+      text-decoration: none;
+      align-content: start;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .strategy-card:hover {
+      border-color: #99f6e4;
       background: #ffffff;
       color: var(--text);
-      text-transform: none;
     }
 
-    .toggle input {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-      accent-color: var(--accent);
-    }
-
-    .toggle span {
+    .card-actions {
       display: grid;
-      gap: 3px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .card-actions a,
+    .card-actions button {
+      width: 100%;
+      height: 34px;
+      font-size: 12px;
+    }
+
+    a.danger {
+      color: #b91c1c;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+    }
+
+    a.danger:hover {
+      color: #ffffff;
+      background: #b91c1c;
+      border-color: #b91c1c;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .coin {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #99f6e4;
+      border-radius: 14px;
+      color: var(--accent-strong);
+      background: linear-gradient(135deg, #ecfdf5, #dff7ff);
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .status {
+      min-width: 74px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .status.on {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .status.off {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    .card-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .card-title strong {
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .fact {
+      min-height: 58px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px;
+      background: rgba(248, 250, 252, 0.92);
+    }
+
+    .fact span {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .fact strong {
+      display: block;
       font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .gain {
+      color: #15803d;
+    }
+
+    .loss {
+      color: #b91c1c;
+    }
+
+    .flat {
+      color: var(--text);
+    }
+
+    .add-card {
+      height: auto;
+      min-height: 286px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text);
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    .add-card:hover {
+      border-color: #99f6e4;
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .add-card-inner {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .plus {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #99f6e4;
+      border-radius: 16px;
+      color: var(--accent-strong);
+      background: #ecfdf5;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .hero-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 18px 0 6px;
+    }
+
+    .hero-stat {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .hero-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-stat strong {
+      font-size: 18px;
+      color: var(--ink);
+    }
+
+    button.ghost {
+      color: var(--accent);
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    button.ghost:hover {
+      background: #ecfdf5;
+      color: var(--accent-strong);
+    }
+
+    .empty {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: var(--panel);
+      color: var(--muted);
       font-weight: 700;
     }
 
-    .toggle small {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 1.35;
-    }
-
-    .flow {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .stage {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 12px;
-      background: var(--soft);
-      min-height: 120px;
-    }
-
-    .stage strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 13px;
-    }
-
-    .stage p {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .danger {
-      color: var(--warn);
-    }
-
-    @media (max-width: 980px) {
-      .layout,
-      .grid-2,
-      .grid-3,
-      .flow {
-        grid-template-columns: 1fr;
+    @media (max-width: 1080px) {
+      .cards {
+        grid-template-columns: repeat(2, minmax(260px, 1fr));
       }
+    }
 
-      header {
+    @media (max-width: 760px) {
+      header,
+      .section-head,
+      .add-card {
         display: block;
       }
 
       .nav {
         margin-top: 14px;
       }
-    }
 
-    @media (max-width: 620px) {
-      .shell {
-        width: min(100vw - 20px, 1440px);
-      }
-
-      .checks {
+      .cards {
         grid-template-columns: 1fr;
       }
+
+      .hero-strip {
+        grid-template-columns: 1fr 1fr;
+      }
+
     }
   </style>
 </head>
@@ -361,259 +435,103 @@
   <main class="shell">
     <header>
       <div>
-        <h1>RTA System Home</h1>
-        <p class="subtitle">Master assets, strategy modules, and regime flags</p>
+        <h1>RTA Home</h1>
+        <p class="subtitle">Estrategias actuales, estado IRT ficticio y acceso rapido a ejecucion.</p>
       </div>
       <nav class="nav">
-        <a class="secondary" href="/">Historical viewer</a>
-        <a href="/?symbol={{ selected_master | urlencode }}&strategy=adaptive_trend_guard">Open selected master</a>
+        <span class="refresh-pill">Lee estado guardado</span>
+        <form method="post" action="/irt/refresh-all">
+          <button type="submit"><i data-lucide="refresh-cw"></i>Actualizar ahora</button>
+        </form>
+        <a class="secondary" href="/irt/history"><i data-lucide="history"></i>Historial IRT</a>
+        <a class="secondary" href="/"><i data-lucide="line-chart"></i>TestBack</a>
       </nav>
     </header>
 
-    <section class="layout">
-      <aside class="panel">
-        <div class="panel-head">
-          <h2>Masters</h2>
-          <span class="meta">{{ master_rows | length }} configured</span>
-        </div>
-        <form class="add-form" method="get" action="/home">
-          <input type="hidden" name="masters" value="{{ masters }}">
-          <input type="hidden" name="selected_master" value="{{ selected_master }}">
-          {% for key, enabled in enabled_modules.items() %}
-            <input type="hidden" name="{{ key }}" value="{{ 'true' if enabled else 'false' }}">
-          {% endfor %}
-          {% for key, enabled in enabled_flags.items() %}
-            <input type="hidden" name="{{ key }}" value="{{ 'true' if enabled else 'false' }}">
-          {% endfor %}
-          <input type="hidden" name="main_strategy" value="{{ main_strategy }}">
-          <input type="hidden" name="main_timeframe" value="{{ main_timeframe }}">
-          <input type="hidden" name="secondary_rebound_strategy" value="{{ secondary_rebound_strategy }}">
-          <input type="hidden" name="secondary_sideways_strategy" value="{{ secondary_sideways_strategy }}">
-          <input type="hidden" name="secondary_defensive_strategy" value="{{ secondary_defensive_strategy }}">
-          <input type="hidden" name="main_allocation_pct" value="{{ main_allocation_pct }}">
-          <input type="hidden" name="rebound_allocation_pct" value="{{ rebound_allocation_pct }}">
-          <input type="hidden" name="sideways_allocation_pct" value="{{ sideways_allocation_pct }}">
-          <input type="hidden" name="defensive_cash_pct" value="{{ defensive_cash_pct }}">
-          <label>
-            Add master
-            <input name="new_master" placeholder="BTC or BTC/USDT" autocomplete="off">
-          </label>
-          <button type="submit">Add master</button>
-        </form>
+    <section class="hero-strip">
+      <div class="hero-stat"><span>Ejecuciones</span><strong>{{ strategy_cards | length }}</strong></div>
+      <div class="hero-stat"><span>Motor</span><strong>Paper</strong></div>
+      <div class="hero-stat"><span>Datos</span><strong>Binance</strong></div>
+      <div class="hero-stat"><span>Modo</span><strong>Ficticio</strong></div>
+    </section>
 
-        <div class="master-list">
-          {% for master in master_rows %}
-            <article class="master {% if master.selected %}selected{% endif %}">
-              <div class="master-top">
-                <strong>{{ master.symbol }}</strong>
-                <a class="select-master" href="/home?masters={{ masters | urlencode }}&selected_master={{ master.symbol | urlencode }}">Select</a>
-              </div>
-              <p class="meta">
-                Binance {{ master.timeframe }} rows: {{ master.rows }}<br>
-                From: {{ master.from }}<br>
-                To: {{ master.to }}
-              </p>
-              <a class="secondary" href="/?exchange=binance&symbol={{ master.symbol | urlencode }}&timeframe={{ main_timeframe }}&strategy={{ main_strategy }}">Backtest</a>
-            </article>
-          {% endfor %}
-        </div>
-      </aside>
+    {% if refresh_message %}
+      <section class="notice">{{ refresh_message }}</section>
+    {% endif %}
+    {% if refresh_error %}
+      <section class="notice error">{{ refresh_error }}</section>
+    {% endif %}
 
-      <section class="workspace">
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>{{ selected_master }} System</h2>
-              <p class="meta">Configure which modules are allowed to wake up for this master.</p>
+    <section class="section-head">
+      <div>
+        <h2>Ejecuciones IRT</h2>
+        <p class="meta">Solo aparecen las estrategias que decidiste ejecutar en IRT ficticio.</p>
+      </div>
+      <span class="meta">{{ strategy_cards | length }} activas</span>
+    </section>
+
+    <section class="cards">
+      {% if strategy_cards %}
+        {% for card in strategy_cards %}
+          <article class="strategy-card">
+            <div class="card-top">
+              <div class="coin">{{ card.icon }}</div>
+              <span class="status {{ card.state_class }}">{{ card.state_label }}</span>
             </div>
-            <a class="secondary" href="/?exchange=binance&symbol={{ selected_master | urlencode }}&timeframe=1h&strategy=adaptive_trend_guard">Run viewer</a>
-          </div>
-          {% if saved_message %}
-            <div class="notice">{{ saved_message }}</div>
-          {% endif %}
-
-          <form class="config-form" method="get" action="/home">
-            <input type="hidden" name="masters" value="{{ masters }}">
-            <input type="hidden" name="selected_master" value="{{ selected_master }}">
-
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Main Strategy</h3>
-                  <p class="meta">Base system for {{ selected_master }}. This is the strategy that stays active unless a regime flag hands control to a secondary.</p>
-                </div>
-              </div>
-              <div class="grid-3">
-                <label>
-                  Main
-                  <select name="main_strategy">
-                    {% for option in strategy_options %}
-                      <option value="{{ option.value }}" {% if main_strategy == option.value %}selected{% endif %}>{{ option.label }}</option>
-                    {% endfor %}
-                  </select>
-                </label>
-                <label>
-                  Main timeframe
-                  <select name="main_timeframe">
-                    {% for option in timeframe_options %}
-                      <option value="{{ option }}" {% if main_timeframe == option %}selected{% endif %}>{{ option }}</option>
-                    {% endfor %}
-                  </select>
-                </label>
-                <label>
-                  Main allocation %
-                  <input name="main_allocation_pct" type="number" min="0" max="100" step="1" value="{{ main_allocation_pct }}">
-                </label>
-              </div>
-              <label style="margin-top: 12px;">
-                Master name
-                <input name="master_name" value="{{ master_name }}" placeholder="BTC 1h Defensive Trend">
-              </label>
-            </section>
-
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Secondary Strategies & Economy</h3>
-                  <p class="meta">Each secondary owns its wake flags. Allocation defines how much capital it may control when active.</p>
-                </div>
-              </div>
-              <div class="grid-3">
-                <article class="strategy-card">
-                  <strong>Rebound module</strong>
-                  <p class="meta">Wakes after panic flush + base reclaim.</p>
-                  <div class="checks">
-                    <label class="toggle">
-                      <input type="hidden" name="panic_flush_flag" value="false">
-                      <input type="checkbox" name="panic_flush_flag" value="true" {% if enabled_flags.panic_flush_flag %}checked{% endif %}>
-                      <span>Panic flush<small>Large bearish move arms rebound logic.</small></span>
-                    </label>
-                    <label class="toggle">
-                      <input type="hidden" name="reclaim_flag" value="false">
-                      <input type="checkbox" name="reclaim_flag" value="true" {% if enabled_flags.reclaim_flag %}checked{% endif %}>
-                      <span>Base reclaim<small>Price recovers a broken base before entry.</small></span>
-                    </label>
-                  </div>
-                  <label>
-                    Strategy
-                    <select name="secondary_rebound_strategy">
-                      {% for option in strategy_options %}
-                        <option value="{{ option.value }}" {% if secondary_rebound_strategy == option.value %}selected{% endif %}>{{ option.label }}</option>
-                      {% endfor %}
-                    </select>
-                  </label>
-                  <label>
-                    Priority allocation %
-                    <input name="rebound_allocation_pct" type="number" min="0" max="100" step="1" value="{{ rebound_allocation_pct }}">
-                  </label>
-                </article>
-                <article class="strategy-card">
-                  <strong>Sideways module</strong>
-                  <p class="meta">Wakes when trend is weak and range conditions are active.</p>
-                  <div class="checks">
-                    <label class="toggle">
-                      <input type="hidden" name="sideways_flag" value="false">
-                      <input type="checkbox" name="sideways_flag" value="true" {% if enabled_flags.sideways_flag %}checked{% endif %}>
-                      <span>Sideways regime<small>Market is compressed or range-bound.</small></span>
-                    </label>
-                  </div>
-                  <label>
-                    Strategy
-                    <select name="secondary_sideways_strategy">
-                      {% for option in strategy_options %}
-                        <option value="{{ option.value }}" {% if secondary_sideways_strategy == option.value %}selected{% endif %}>{{ option.label }}</option>
-                      {% endfor %}
-                    </select>
-                  </label>
-                  <label>
-                    Priority allocation %
-                    <input name="sideways_allocation_pct" type="number" min="0" max="100" step="1" value="{{ sideways_allocation_pct }}">
-                  </label>
-                </article>
-                <article class="strategy-card">
-                  <strong>Defensive module</strong>
-                  <p class="meta">Wakes when breakdown guard suspends trend exposure.</p>
-                  <div class="checks">
-                    <label class="toggle">
-                      <input type="hidden" name="bear_flag" value="false">
-                      <input type="checkbox" name="bear_flag" value="true" {% if enabled_flags.bear_flag %}checked{% endif %}>
-                      <span>Bear regime<small>Suspends normal long trend modules.</small></span>
-                    </label>
-                    <label class="toggle">
-                      <input type="hidden" name="breakdown_flag" value="false">
-                      <input type="checkbox" name="breakdown_flag" value="true" {% if enabled_flags.breakdown_flag %}checked{% endif %}>
-                      <span>Breakdown guard<small>Prevents buying into unresolved descent.</small></span>
-                    </label>
-                  </div>
-                  <label>
-                    Strategy
-                    <select name="secondary_defensive_strategy">
-                      {% for option in strategy_options %}
-                        <option value="{{ option.value }}" {% if secondary_defensive_strategy == option.value %}selected{% endif %}>{{ option.label }}</option>
-                      {% endfor %}
-                    </select>
-                  </label>
-                  <label>
-                    Cash / protection %
-                    <input name="defensive_cash_pct" type="number" min="0" max="100" step="1" value="{{ defensive_cash_pct }}">
-                  </label>
-                </article>
-              </div>
-            </section>
-
-            <button type="submit" name="save_master" value="true">Save master</button>
-          </form>
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h2>Saved Masters</h2>
-            <span class="meta">{{ saved_masters | length }} saved</span>
-          </div>
-          {% if saved_masters %}
-            <div class="saved-grid">
-              {% for master in saved_masters %}
-                <article class="saved-master">
-                  <h3>{{ master.name }}</h3>
-                  <p class="meta">
-                    {{ master.symbol }} | {{ master.main_timeframe }} | {{ master.main_strategy }}<br>
-                    Main {{ master.main_allocation_pct }}% · Rebound {{ master.rebound_allocation_pct }}% · Sideways {{ master.sideways_allocation_pct }}%
-                  </p>
-                  <a class="secondary" href="/?master_config={{ master.name | urlencode }}">Test master</a>
-                </article>
-              {% endfor %}
+            <div class="card-title">
+              <strong>{{ card.symbol }}</strong>
+              <p class="meta">Estrategia usada: {{ card.strategy_label }}</p>
             </div>
-          {% else %}
-            <p class="meta">No saved masters yet. Configure one above and click Save master.</p>
-          {% endif %}
-        </section>
-
-        <section class="panel">
-          <div class="panel-head">
-            <h2>System Flow</h2>
-            <span class="meta">v1 orchestration blueprint</span>
+            <div class="facts">
+              <div class="fact"><span>Timeframe</span><strong>{{ card.timeframe }}</strong></div>
+              <div class="fact"><span>Fecha de inicio</span><strong>{{ card.start_date }}</strong></div>
+              <div class="fact"><span>Tiempo activa</span><strong>{{ card.active_time }}</strong></div>
+              <div class="fact"><span>Inicio</span><strong>{{ card.initial_capital }}</strong></div>
+              <div class="fact"><span>Ganancia/Perdida</span><strong class="{{ card.profit_loss_class }}">{{ card.profit_loss }}</strong></div>
+              <div class="fact"><span>Rendimiento</span><strong>{{ card.gain_pct }}</strong></div>
+              <div class="fact"><span>Drawdown</span><strong>{{ card.drawdown_pct }}</strong></div>
+              <div class="fact"><span>Trades / senal</span><strong>{{ card.trades }} / {{ card.last_signal }}</strong></div>
+              <div class="fact"><span>Posicion</span><strong>{{ card.position }}</strong></div>
+              <div class="fact"><span>Entrada</span><strong>{{ card.entry_price }}</strong></div>
+              <div class="fact"><span>P/L flotante</span><strong class="{{ card.floating_pl_class }}">{{ card.floating_pl }}</strong></div>
+              <div class="fact"><span>Ultimo precio</span><strong>{{ card.latest_price }}</strong></div>
+              <div class="fact"><span>Actualizado</span><strong>{{ card.last_update }}</strong></div>
+            </div>
+            <div class="card-actions">
+              <a class="secondary" href="{{ card.href }}"><i data-lucide="external-link"></i>Abrir</a>
+              <form method="post" action="/irt/toggle">
+                <input type="hidden" name="symbol" value="{{ card.symbol }}">
+                <input type="hidden" name="timeframe" value="{{ card.timeframe }}">
+                <input type="hidden" name="strategy" value="{{ card.strategy_key }}">
+                <input type="hidden" name="enabled" value="{{ card.next_enabled }}">
+                <input type="hidden" name="redirect_to" value="home">
+                <button class="ghost" type="submit"><i data-lucide="{{ card.toggle_icon }}"></i>{{ card.toggle_label }}</button>
+              </form>
+              <a class="danger" href="{{ card.finalize_href }}"><i data-lucide="x-circle"></i>Finalizar</a>
+            </div>
+            <form method="post" action="/irt/refresh">
+              <input type="hidden" name="symbol" value="{{ card.symbol }}">
+              <input type="hidden" name="timeframe" value="{{ card.timeframe }}">
+              <input type="hidden" name="strategy" value="{{ card.strategy_key }}">
+              <input type="hidden" name="redirect_to" value="home">
+              <button type="submit" style="width: 100%;"><i data-lucide="refresh-cw"></i>Actualizar esta</button>
+            </form>
+          </article>
+        {% endfor %}
+      {% endif %}
+      <a class="add-card" href="/irt">
+        <div class="add-card-inner">
+          <div class="plus">+</div>
+          <div>
+            <h2>Agregar ejecucion IRT</h2>
+            <p class="meta">Selecciona estrategia, simbolo, timeframe y capital ficticio. Al ejecutar, quedara fijada aqui.</p>
           </div>
-          <div class="flow">
-            <article class="stage">
-              <strong>1. Detect regime</strong>
-              <p>Classify {{ selected_master }} as bull, bear, or sideways using trend and structure flags.</p>
-            </article>
-            <article class="stage">
-              <strong>2. Route modules</strong>
-              <p>Main runs on {{ main_timeframe }}. Each secondary owns its own wake flags and can take control only when those flags are true.</p>
-            </article>
-            <article class="stage">
-              <strong>3. Apply economy</strong>
-              <p>Main can use {{ main_allocation_pct }}%. Rebound can use {{ rebound_allocation_pct }}%. Sideways can use {{ sideways_allocation_pct }}%. Defensive cash can protect {{ defensive_cash_pct }}%.</p>
-            </article>
-            <article class="stage">
-              <strong>4. Execute system</strong>
-              <p>Only one module should control exposure at a time, with clear reason labels on every signal.</p>
-            </article>
-          </div>
-        </section>
-      </section>
+        </div>
+      </a>
     </section>
   </main>
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>

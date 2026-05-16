@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% if is_active_run and run_enabled %}
+  <meta http-equiv="refresh" content="60">
+  {% endif %}
+  <title>RTA IRT</title>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef3f8;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d9e2ee;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --soft: #f7fafc;
+      --danger-bg: #fff7ed;
+      --danger-line: #fed7aa;
+      --success-bg: #f0fdf4;
+      --success-line: #bbf7d0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(15, 118, 110, 0.11), transparent 30%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 42%, #eef3f8 100%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .shell {
+      width: min(1440px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 34px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .refresh-pill {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    a,
+    button {
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 14px;
+      color: #ffffff;
+      background: var(--accent);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    i[data-lucide] {
+      width: 16px;
+      height: 16px;
+      margin-right: 7px;
+    }
+
+    a.secondary {
+      color: var(--accent);
+      background: #ecfdf5;
+      border: 1px solid #99f6e4;
+    }
+
+    a.danger {
+      color: #b91c1c;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+    }
+
+    button.ghost {
+      color: var(--accent);
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    button:hover,
+    a:hover {
+      background: var(--accent-strong);
+      color: #ffffff;
+    }
+
+    a.danger:hover {
+      background: #b91c1c;
+      border-color: #b91c1c;
+      color: #ffffff;
+    }
+
+    button.ghost:hover {
+      background: #ecfdf5;
+      color: var(--accent-strong);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+    }
+
+    aside form {
+      display: block;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 10px;
+      color: var(--text);
+      background: #ffffff;
+      font-size: 14px;
+    }
+
+    .workspace {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 74px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: var(--soft);
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 15px;
+      overflow-wrap: anywhere;
+    }
+
+    .notice {
+      border: 1px solid var(--success-line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--success-bg);
+      color: #166534;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .error {
+      border-color: var(--danger-line);
+      background: var(--danger-bg);
+      color: #9a3412;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .chart {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 8px;
+      min-height: 520px;
+    }
+
+    .table-panel {
+      background: rgba(255, 255, 255, 0.86);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .state-pill {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0 10px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .state-pill.on {
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .state-pill.off {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: #f8fafc;
+    }
+
+    th:first-child,
+    td:first-child,
+    th:nth-child(2),
+    td:nth-child(2) {
+      text-align: left;
+    }
+
+    @media (max-width: 980px) {
+      header,
+      .layout {
+        display: block;
+      }
+
+      .nav {
+        margin-top: 14px;
+      }
+
+      .workspace {
+        margin-top: 16px;
+      }
+
+      .grid,
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .shell {
+        width: min(100vw - 20px, 1440px);
+      }
+
+      .grid,
+      .summary {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>RTA IRT</h1>
+        <p class="subtitle">Arranca estrategias ya probadas desde el momento actual con dinero ficticio.</p>
+      </div>
+      <nav class="nav">
+        {% if is_active_run %}
+          <span class="refresh-pill">Lee estado guardado</span>
+        {% endif %}
+        <a class="secondary" href="/home"><i data-lucide="layout-dashboard"></i>Home</a>
+        <a class="secondary" href="/irt/history"><i data-lucide="history"></i>Historial IRT</a>
+        <a class="secondary" href="/"><i data-lucide="line-chart"></i>TestBack</a>
+      </nav>
+    </header>
+
+    {% if data_message %}
+      <section class="notice">{{ data_message }}</section>
+    {% endif %}
+    {% if data_error %}
+      <section class="notice error">{{ data_error }}</section>
+    {% endif %}
+
+    <section class="layout">
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>IRT</h2>
+          <span class="meta">fictional</span>
+        </div>
+        {% if is_active_run %}
+          <p class="meta">Esta ejecucion ya esta activa. El motor paper trading procesa nuevas velas automaticamente y evita duplicar senales.</p>
+        {% else %}
+          <p class="meta">Selecciona una estrategia revisada en TestBack. Al ejecutarla, se fija desde la vela actual y queda visible en Home.</p>
+        {% endif %}
+        {% if is_active_run %}
+          <div style="margin-top: 14px;">
+            <span class="state-pill {{ state_class }}">{{ state_label }}</span>
+          </div>
+        {% endif %}
+        <a class="secondary" href="/home" style="margin-top: 14px;"><i data-lucide="arrow-left"></i>Volver a Home</a>
+        {% if is_active_run %}
+          <form method="post" action="/irt/toggle" style="margin-top: 10px;">
+            <input type="hidden" name="symbol" value="{{ symbol }}">
+            <input type="hidden" name="timeframe" value="{{ timeframe }}">
+            <input type="hidden" name="strategy" value="{{ strategy }}">
+            <input type="hidden" name="enabled" value="{{ next_enabled }}">
+            <input type="hidden" name="redirect_to" value="irt">
+            <button class="ghost" type="submit" style="width: 100%;"><i data-lucide="{{ toggle_icon }}"></i>{{ toggle_label }} ejecucion</button>
+          </form>
+          <form method="post" action="/irt/refresh" style="margin-top: 10px;">
+            <input type="hidden" name="symbol" value="{{ symbol }}">
+            <input type="hidden" name="timeframe" value="{{ timeframe }}">
+            <input type="hidden" name="strategy" value="{{ strategy }}">
+            <input type="hidden" name="redirect_to" value="irt">
+            <button type="submit" style="width: 100%;"><i data-lucide="refresh-cw"></i>Actualizar ahora</button>
+          </form>
+          <a class="secondary" href="{{ chart_href }}" style="margin-top: 10px;"><i data-lucide="candlestick-chart"></i>Cargar grafico</a>
+          <a class="danger" href="{{ finalize_href }}" style="margin-top: 10px;"><i data-lucide="x-circle"></i>Finalizar estrategia</a>
+        {% endif %}
+      </aside>
+
+      <section class="workspace">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>{% if is_active_run %}Paper trading activo{% else %}Nueva ejecucion IRT{% endif %}</h2>
+              <p class="meta">{% if is_active_run %}Compra/venta ficticia automatica sobre nuevas velas. No manda ordenes reales.{% else %}La primera ejecucion fija el inicio en la vela actual. Las ganancias/perdidas solo se cuentan desde ese inicio.{% endif %}</p>
+            </div>
+            <span class="meta">Latest: {{ latest_datetime }} | {{ latest_price }}</span>
+          </div>
+          {% if is_active_run %}
+            <div class="summary">
+              <div class="metric"><span>Symbol</span><strong>{{ symbol }}</strong></div>
+              <div class="metric"><span>Timeframe</span><strong>{{ timeframe }}</strong></div>
+              <div class="metric"><span>Strategy</span><strong>{{ summary.strategy }}</strong></div>
+              <div class="metric"><span>Mode</span><strong>{{ summary.mode }}</strong></div>
+              <div class="metric"><span>Position</span><strong>{{ summary.position }}</strong></div>
+              <div class="metric"><span>Entry price</span><strong>{{ summary.entry_price }}</strong></div>
+              <div class="metric"><span>Floating P/L</span><strong>{{ summary.floating_pl }}</strong></div>
+              <div class="metric"><span>Last update</span><strong>{{ summary.last_update }}</strong></div>
+            </div>
+          {% else %}
+            <form method="get" action="/irt">
+              <div class="grid">
+                <label>
+                  Symbol
+                  <select name="symbol">
+                    {% for option in symbol_options %}
+                      <option value="{{ option }}" {% if symbol == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                    {% if symbol not in symbol_options %}
+                      <option value="{{ symbol }}" selected>{{ symbol }}</option>
+                    {% endif %}
+                  </select>
+                </label>
+                <label>
+                  Timeframe
+                  <select name="timeframe">
+                    {% for option in timeframe_options %}
+                      <option value="{{ option }}" {% if timeframe == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label>
+                  Strategy
+                  <select name="strategy">
+                    {% for option in strategy_options %}
+                      <option value="{{ option.value }}" {% if strategy == option.value %}selected{% endif %}>{{ option.label }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label>
+                  Fictional USD
+                  <input name="initial_capital" type="number" min="1" step="0.01" value="{{ initial_capital }}">
+                </label>
+                <label>
+                  Lookback candles
+                  <input name="lookback" type="number" min="50" max="1500" value="{{ lookback }}">
+                </label>
+                <label>
+                  Fee bps
+                  <input name="fee_bps" type="number" min="0" max="1000" step="0.01" value="{{ fee_bps }}">
+                </label>
+                <label>
+                  Slippage bps
+                  <input name="slippage_bps" type="number" min="0" max="1000" step="0.01" value="{{ slippage_bps }}">
+                </label>
+                <label>
+                  Position mode
+                  <select name="position_mode">
+                    <option value="compound" {% if position_mode == "compound" %}selected{% endif %}>Compound equity</option>
+                    <option value="fixed" {% if position_mode == "fixed" %}selected{% endif %}>Fixed stake</option>
+                  </select>
+                </label>
+                <button type="submit" name="run_irt" value="true">Iniciar paper trading</button>
+              </div>
+            </form>
+          {% endif %}
+        </section>
+
+        <section class="summary">
+          <div class="metric"><span>Mode</span><strong>{{ summary.mode }}</strong></div>
+          <div class="metric"><span>Rows</span><strong>{{ summary.rows }}</strong></div>
+          <div class="metric"><span>Strategy</span><strong>{{ summary.strategy }}</strong></div>
+          <div class="metric"><span>Last signal</span><strong>{{ summary.last_signal }}</strong></div>
+          <div class="metric"><span>Initial USD</span><strong>{{ summary.initial_capital }}</strong></div>
+          <div class="metric"><span>Final USD</span><strong>{{ summary.final_equity }}</strong></div>
+          <div class="metric"><span>P/L USD</span><strong>{{ summary.profit_loss }}</strong></div>
+          <div class="metric"><span>IRT gain</span><strong>{{ summary.total_return_pct }}</strong></div>
+          <div class="metric"><span>Buy & hold</span><strong>{{ summary.buy_and_hold_return_pct }}</strong></div>
+          <div class="metric"><span>Drawdown</span><strong>{{ summary.max_drawdown_pct }}</strong></div>
+          <div class="metric"><span>Trades</span><strong>{{ summary.trades }}</strong></div>
+          <div class="metric"><span>Win rate</span><strong>{{ summary.win_rate_pct }}</strong></div>
+          <div class="metric"><span>Profit factor</span><strong>{{ summary.profit_factor }}</strong></div>
+          <div class="metric"><span>Position</span><strong>{{ summary.position }}</strong></div>
+          <div class="metric"><span>Entry price</span><strong>{{ summary.entry_price }}</strong></div>
+          <div class="metric"><span>Floating P/L</span><strong>{{ summary.floating_pl }}</strong></div>
+          <div class="metric"><span>Latest price</span><strong>{{ summary.latest_price }}</strong></div>
+          <div class="metric"><span>Last update</span><strong>{{ summary.last_update }}</strong></div>
+          <div class="metric"><span>Position mode</span><strong>{{ summary.position_mode }}</strong></div>
+          <div class="metric"><span>Fee bps</span><strong>{{ summary.fee_bps }}</strong></div>
+          <div class="metric"><span>Slippage bps</span><strong>{{ summary.slippage_bps }}</strong></div>
+        </section>
+
+        {% if chart_html %}
+          <section class="chart">
+            {{ chart_html | safe }}
+          </section>
+          {% if equity_chart_html %}
+            <section class="chart">
+              {{ equity_chart_html | safe }}
+            </section>
+          {% endif %}
+        {% elif is_active_run %}
+          <section class="notice">Grafico omitido para navegar rapido. Usa Cargar grafico cuando quieras verlo.</section>
+        {% endif %}
+
+        {% if trade_log %}
+          <section class="table-panel">
+            <div class="table-header">
+              <h2>IRT Trade Log</h2>
+              <span>{{ trade_log | length }} closed trades</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Entry datetime</th>
+                    <th>Exit datetime</th>
+                    <th>Entry price</th>
+                    <th>Exit price</th>
+                    <th>Return</th>
+                    <th>P/L USD</th>
+                    <th>Equity after</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for trade in trade_log %}
+                    <tr>
+                      <td>{{ trade.entry_datetime }}</td>
+                      <td>{{ trade.exit_datetime }}</td>
+                      <td>{{ trade.entry_price }}</td>
+                      <td>{{ trade.exit_price }}</td>
+                      <td>{{ trade.return_pct }}</td>
+                      <td>{{ trade.pl_usd }}</td>
+                      <td>{{ trade.equity_after }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        {% endif %}
+      </section>
+    </section>
+  </main>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

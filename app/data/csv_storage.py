@@ -21,6 +21,8 @@ class CsvMarketDataStorage:
             return pd.DataFrame(columns=EXPECTED_COLUMNS)
 
         data = pd.read_csv(path)
+        data = self._drop_incomplete_rows(data)
+        data = data.drop_duplicates(subset=["timestamp"], keep="last")
         return validate_ohlcv_dataframe(data)
 
     def save(
@@ -40,3 +42,13 @@ class CsvMarketDataStorage:
 
         combined.to_csv(path, index=False)
         return path
+
+    def _drop_incomplete_rows(self, data: pd.DataFrame) -> pd.DataFrame:
+        if data.empty:
+            return data
+
+        available_columns = [column for column in EXPECTED_COLUMNS if column in data.columns]
+        if not available_columns:
+            return data
+
+        return data.dropna(subset=available_columns, how="any").reset_index(drop=True)
