@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 import pandas as pd
 
@@ -187,8 +188,8 @@ def run_allocated_master_signal_backtest(
         best_trade_pct=stats["best_trade_pct"],
         worst_trade_pct=stats["worst_trade_pct"],
         average_trade_pct=stats["average_trade_pct"],
-        max_winning_streak=stats["max_winning_streak"],
-        max_losing_streak=stats["max_losing_streak"],
+        max_winning_streak=int(stats["max_winning_streak"]),
+        max_losing_streak=int(stats["max_losing_streak"]),
         final_equity=final_equity,
         equity_curve=equity_frame,
         trade_log=trade_log,
@@ -371,12 +372,14 @@ def _trade_stats(trade_log: pd.DataFrame) -> dict[str, float | int]:
     gross_profit = trade_log.loc[trade_log["pl_usd"] > 0, "pl_usd"].sum()
     gross_loss = abs(trade_log.loc[trade_log["pl_usd"] < 0, "pl_usd"].sum())
     profit_factor = gross_profit / gross_loss if gross_loss > 0 else float("inf")
-    max_winning_streak, max_losing_streak = _streaks(trade_log["pl_usd"])
+    pl_usd = cast(pd.Series, trade_log["pl_usd"])
+    return_pct = cast(pd.Series, trade_log["return_pct"])
+    max_winning_streak, max_losing_streak = _streaks(pl_usd)
     return {
         "profit_factor": float(profit_factor),
-        "best_trade_pct": float(trade_log["return_pct"].max()),
-        "worst_trade_pct": float(trade_log["return_pct"].min()),
-        "average_trade_pct": float(trade_log["return_pct"].mean()),
+        "best_trade_pct": float(return_pct.max()),
+        "worst_trade_pct": float(return_pct.min()),
+        "average_trade_pct": float(return_pct.mean()),
         "max_winning_streak": max_winning_streak,
         "max_losing_streak": max_losing_streak,
     }

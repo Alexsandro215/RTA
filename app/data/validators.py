@@ -1,3 +1,5 @@
+from typing import cast
+
 import pandas as pd
 
 from app.data.market_data_provider import (
@@ -37,9 +39,10 @@ def validate_ohlcv_dataframe(data: pd.DataFrame) -> pd.DataFrame:
             f"Missing required columns: {', '.join(missing_columns)}"
         )
 
-    data = data[EXPECTED_COLUMNS].copy()
+    data = cast(pd.DataFrame, data[EXPECTED_COLUMNS].copy())
 
-    if data[EXPECTED_COLUMNS].isna().any().any():
+    has_nulls = bool(data[EXPECTED_COLUMNS].isna().to_numpy().any())
+    if has_nulls:
         raise MarketDataValidationError("OHLCV data contains null values.")
 
     for column in NUMERIC_COLUMNS:

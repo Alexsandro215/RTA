@@ -429,6 +429,23 @@
       letter-spacing: 0;
     }
 
+    .result-title-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+      min-width: 220px;
+    }
+
+    .result-title-actions form {
+      margin: 0;
+    }
+
+    .result-title-actions button {
+      min-width: 140px;
+    }
+
     .drawer {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -570,6 +587,17 @@
 
     .inline-action button:hover {
       background: #7c2d12;
+    }
+
+    .inline-mini {
+      width: auto;
+      min-height: 22px;
+      margin-left: 6px;
+      padding: 3px 7px;
+      font-size: 10px;
+      color: var(--accent);
+      background: #ecfdf5;
+      border: 1px solid #99f6e4;
     }
 
     .table-panel {
@@ -1010,31 +1038,31 @@
           <div class="action-group">
             <span class="action-group-title">Ejecutar backtests</span>
             <div class="backtest-actions">
-            <button class="button-primary" type="submit" name="compare_strategies" value="true">Compare current TF</button>
+            <button class="button-primary" type="submit" name="compare_strategies" value="true">Comparar TF actual</button>
             <button class="button-secondary" type="submit" name="walk_forward" value="true">Walk-forward</button>
-            <button class="button-secondary" type="submit" name="compare_timeframes" value="true">Compare timeframes</button>
+            <button class="button-secondary" type="submit" name="compare_timeframes" value="true">Comparar timeframes</button>
             <button
               class="button-warning"
-              type="submit"
+              type="button"
               name="strategy_compare_scope"
               value="all"
               data-confirm-long-backtest="true"
+              data-start-job="strategy-comparison"
             >
-              Compare all TFs
+              Comparar todos los TFs
             </button>
-            <button class="button-muted" type="submit" name="save_result" value="true">Save result</button>
             </div>
           </div>
           <div class="action-group admin-actions">
             <span class="action-group-title">Administracion</span>
             <div class="backtest-actions">
-            <button class="button-muted" type="submit" name="fetch_all_history" value="true">Download all listed</button>
-            <button class="button-muted" type="button" data-open-modal="download-config-modal">Download config</button>
+            <button class="button-muted" type="button" data-open-modal="download-all-config-modal">Descarga masiva</button>
+            <button class="button-muted" type="button" data-open-modal="download-config-modal">Configurar descarga</button>
             <input id="strategy-file-input" class="sr-only" form="strategy-upload-form" name="strategy_file" type="file" accept=".py">
             <button class="button-secondary" id="strategy-upload-button" type="button">Agregar estrategia .py</button>
-            <button class="button-muted" type="button" data-open-modal="dataset-status-modal">Dataset status</button>
-            <button class="button-muted" type="button" data-open-modal="saved-results-modal">Saved results</button>
-            <button class="button-muted" type="button" data-open-modal="custom-strategies-modal">Custom strategies</button>
+            <button class="button-muted" type="button" data-open-modal="dataset-status-modal">Estado datasets</button>
+            <button class="button-muted" type="button" data-open-modal="saved-results-modal">Resultados guardados</button>
+            <button class="button-muted" type="button" data-open-modal="custom-strategies-modal">Estrategias custom</button>
             </div>
           </div>
         </div>
@@ -1059,6 +1087,7 @@
     {% if saved_result_message %}
       <section class="notice">{{ saved_result_message }}</section>
     {% endif %}
+    <section id="job-status" class="notice" hidden></section>
     {% if data_error %}
       <section class="empty" style="margin-bottom: 16px;">
         {{ data_error }}
@@ -1337,7 +1366,7 @@
           <button class="modal-close" type="button" data-close-modal>Close</button>
         </div>
         <div class="modal-body">
-          <section class="table-panel">
+          <section class="table-panel" data-saved-results-panel>
             <div class="table-header">
               <h2>Download from exchange</h2>
               <span>Choose exact dataset target</span>
@@ -1410,6 +1439,65 @@
       </section>
     </div>
 
+    <div id="download-all-config-modal" class="modal-backdrop" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="download-all-config-title">
+        <div class="modal-head">
+          <h2 id="download-all-config-title">Download all listed datasets</h2>
+          <button class="modal-close" type="button" data-close-modal>Close</button>
+        </div>
+        <div class="modal-body">
+          <section class="table-panel" data-custom-strategies-panel>
+            <div class="table-header">
+              <h2>Bulk download target</h2>
+              <span>{{ supported_symbols | length }} symbols x {{ supported_timeframes | length }} timeframes</span>
+            </div>
+            <div class="snip-form" style="padding: 14px;">
+              <label>
+                Exchange
+                <select form="dashboard-form" name="exchange">
+                  <option value="binance" {% if exchange == "binance" %}selected{% endif %}>binance</option>
+                  <option value="coinbase" {% if exchange == "coinbase" %}selected{% endif %}>coinbase</option>
+                  <option value="kraken" {% if exchange == "kraken" %}selected{% endif %}>kraken</option>
+                  <option value="okx" {% if exchange == "okx" %}selected{% endif %}>okx</option>
+                  <option value="bybit" {% if exchange == "bybit" %}selected{% endif %}>bybit</option>
+                  {% if exchange not in ["binance", "coinbase", "kraken", "okx", "bybit"] %}
+                    <option value="{{ exchange }}" selected>{{ exchange }}</option>
+                  {% endif %}
+                </select>
+              </label>
+              <label>
+                Fetch since
+                <input form="dashboard-form" name="fetch_since" value="{{ fetch_since }}" placeholder="2024-01-01" autocomplete="off">
+              </label>
+              <label>
+                Fetch until
+                <input form="dashboard-form" name="fetch_until" value="{{ fetch_until }}" placeholder="empty = latest" autocomplete="off">
+              </label>
+              <label>
+                Batch limit
+                <input form="dashboard-form" name="fetch_batch_limit" type="number" min="100" max="1500" value="{{ fetch_batch_limit }}">
+              </label>
+              <label>
+                Max batches
+                <input form="dashboard-form" name="fetch_max_batches" type="number" min="0" max="1000" value="{{ fetch_max_batches }}">
+              </label>
+              <button
+                class="button-warning"
+                form="dashboard-form"
+                type="button"
+                name="fetch_all_history"
+                value="true"
+                data-confirm-bulk-download="true"
+                data-start-job="download-all"
+              >
+                Download every listed dataset
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>
+
     <div id="dataset-status-modal" class="modal-backdrop" hidden>
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="dataset-status-title">
         <div class="modal-head">
@@ -1417,41 +1505,13 @@
           <button class="modal-close" type="button" data-close-modal>Close</button>
         </div>
         <div class="modal-body">
-          <section class="table-panel">
+          <section class="table-panel" data-dataset-status-panel data-exchange="{{ exchange }}">
             <div class="table-header">
               <h2>Dataset Status</h2>
-              <span>{{ exchange }} local CSV coverage</span>
+              <span data-dataset-status-meta>{{ exchange }} local CSV coverage</span>
             </div>
-            {% if dataset_status %}
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Symbol</th>
-                    <th>Coverage</th>
-                    <th>Total rows</th>
-                    {% for item in dataset_status[0].timeframes %}
-                      <th>{{ item.timeframe }}</th>
-                    {% endfor %}
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for row in dataset_status %}
-                    <tr>
-                      <td>{{ row.symbol }}</td>
-                      <td>{{ row.available }}/{{ row.total }}</td>
-                      <td>{{ row.total_rows }}</td>
-                      {% for item in row.timeframes %}
-                        <td title="{{ item.status }}">{{ item.rows }}</td>
-                      {% endfor %}
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            {% else %}
-              <section class="empty">No dataset status available.</section>
-            {% endif %}
+            <section class="empty" data-dataset-status-loading>Open status is loading local CSV coverage...</section>
+            <div class="table-wrap" data-dataset-status-table hidden></div>
           </section>
         </div>
       </section>
@@ -1585,7 +1645,37 @@
 
     <div class="section-title">
       <h2>Resultado principal</h2>
-      <span class="meta">Lo primero que hay que leer antes de abrir detalles</span>
+      <div class="result-title-actions">
+        <span class="meta">Lo primero que hay que leer antes de abrir detalles</span>
+        {% if run_analysis and summary.rows %}
+          <form method="get">
+            <input type="hidden" name="exchange" value="{{ exchange }}">
+            <input type="hidden" name="symbol" value="{{ symbol }}">
+            <input type="hidden" name="timeframe" value="{{ timeframe }}">
+            <input type="hidden" name="strategy" value="{{ strategy }}">
+            <input type="hidden" name="master_config" value="{{ master_config }}">
+            <input type="hidden" name="max_rows" value="{{ max_rows }}">
+            <input type="hidden" name="start_date" value="{{ start_date }}">
+            <input type="hidden" name="end_date" value="{{ end_date }}">
+            <input type="hidden" name="validation_pct" value="{{ validation_pct }}">
+            <input type="hidden" name="fast_period" value="{{ fast_period }}">
+            <input type="hidden" name="slow_period" value="{{ slow_period }}">
+            <input type="hidden" name="rsi_period" value="{{ rsi_period }}">
+            <input type="hidden" name="rsi_oversold" value="{{ rsi_oversold }}">
+            <input type="hidden" name="rsi_overbought" value="{{ rsi_overbought }}">
+            <input type="hidden" name="bollinger_period" value="{{ bollinger_period }}">
+            <input type="hidden" name="bollinger_std" value="{{ bollinger_std }}">
+            <input type="hidden" name="fee_bps" value="{{ fee_bps }}">
+            <input type="hidden" name="slippage_bps" value="{{ slippage_bps }}">
+            <input type="hidden" name="initial_capital" value="{{ initial_capital }}">
+            <input type="hidden" name="position_mode" value="{{ position_mode }}">
+            <input type="hidden" name="show_sma_20" value="{{ 'true' if show_sma_20 else 'false' }}">
+            <input type="hidden" name="show_sma_50" value="{{ 'true' if show_sma_50 else 'false' }}">
+            <input type="hidden" name="show_ema_200" value="{{ 'true' if show_ema_200 else 'false' }}">
+            <button class="button-muted" type="submit" name="save_result" value="true">Save result</button>
+          </form>
+        {% endif %}
+      </div>
     </div>
     <section class="summary compact">
       <div class="metric">
@@ -2033,6 +2123,7 @@
 
     document.querySelectorAll("[data-confirm-long-backtest='true']").forEach((button) => {
       button.addEventListener("click", (event) => {
+        if (button.dataset.startJob === "strategy-comparison") return;
         const confirmed = confirm(
           "This comparison can take a long time because it runs every strategy across every timeframe. Continue?"
         );
@@ -2042,11 +2133,95 @@
       });
     });
 
+    document.querySelectorAll("[data-confirm-bulk-download='true']").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        const confirmed = confirm(
+          "This will download every listed symbol and timeframe for the selected exchange. It can take a long time. Continue?"
+        );
+        if (!confirmed) {
+          event.preventDefault();
+          return;
+        }
+        if (button.dataset.startJob === "download-all") {
+          event.preventDefault();
+          startDownloadAllJob();
+        }
+      });
+    });
+
+    document.querySelectorAll("[data-start-job='strategy-comparison']").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const confirmed = confirm(
+          "This comparison can take a long time because it runs every strategy across every timeframe. Continue?"
+        );
+        if (!confirmed) return;
+        await startStrategyComparisonJob();
+      });
+    });
+
+    function showJobStatus(message) {
+      const status = document.getElementById("job-status");
+      if (!status) return;
+      status.hidden = false;
+      status.textContent = message;
+    }
+
+    async function startStrategyComparisonJob() {
+      const form = document.getElementById("dashboard-form");
+      const payload = new FormData(form);
+      showJobStatus("Comparacion iniciada...");
+      const response = await fetch("/jobs/strategy-comparison", { method: "POST", body: payload });
+      const result = await response.json();
+      pollJob(result.job_id, (jobId) => {
+        const params = new URLSearchParams(new FormData(form));
+        params.set("strategy_compare_scope", "all");
+        params.set("strategy_job_id", jobId);
+        window.location.href = `/?${params.toString()}`;
+      });
+    }
+
+    async function startDownloadAllJob() {
+      const form = document.getElementById("dashboard-form");
+      const payload = new FormData(form);
+      showJobStatus("Descarga masiva iniciada...");
+      const response = await fetch("/jobs/download-all", { method: "POST", body: payload });
+      const result = await response.json();
+      pollJob(result.job_id, () => {
+        showJobStatus("Descarga masiva completada. Abre Estado datasets para revisar cobertura.");
+        datasetStatusLoaded = false;
+      });
+    }
+
+    function pollJob(jobId, onComplete) {
+      const timer = setInterval(async () => {
+        const response = await fetch(`/jobs/${jobId}`);
+        const job = await response.json();
+        showJobStatus(`${job.label || "Trabajo"}: ${job.message || job.status} (${job.progress || 0}%)`);
+        if (job.status === "completed") {
+          clearInterval(timer);
+          onComplete(jobId);
+        }
+        if (job.status === "failed") {
+          clearInterval(timer);
+          showJobStatus(`Error: ${job.error || "trabajo fallido"}`);
+        }
+      }, 1500);
+    }
+
     function openModal(id) {
       const modal = document.getElementById(id);
       if (!modal) return;
       modal.hidden = false;
       modal.classList.add("is-open");
+      if (id === "dataset-status-modal") {
+        loadDatasetStatus();
+      }
+      if (id === "saved-results-modal") {
+        loadSavedResults();
+      }
+      if (id === "custom-strategies-modal") {
+        loadCustomStrategies();
+      }
     }
 
     function closeModal(modal) {
@@ -2076,6 +2251,171 @@
         document.querySelectorAll(".modal-backdrop.is-open").forEach(closeModal);
       }
     });
+
+    let datasetStatusLoaded = false;
+    let savedResultsLoaded = false;
+    let customStrategiesLoaded = false;
+    async function loadDatasetStatus() {
+      if (datasetStatusLoaded) return;
+      const panel = document.querySelector("[data-dataset-status-panel]");
+      if (!panel) return;
+      const exchange = panel.dataset.exchange || "binance";
+      const loading = panel.querySelector("[data-dataset-status-loading]");
+      const target = panel.querySelector("[data-dataset-status-table]");
+      try {
+        const response = await fetch(`/datasets/status?exchange=${encodeURIComponent(exchange)}`);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const payload = await response.json();
+        renderDatasetStatus(target, payload.rows || []);
+        if (loading) loading.hidden = true;
+        if (target) target.hidden = false;
+        datasetStatusLoaded = true;
+      } catch (error) {
+        if (loading) {
+          loading.textContent = "Dataset status could not be loaded.";
+        }
+      }
+    }
+
+    function renderDatasetStatus(target, rows) {
+      if (!target) return;
+      if (!rows.length) {
+        target.innerHTML = '<section class="empty">No dataset status available.</section>';
+        return;
+      }
+      const timeframes = rows[0].timeframes || [];
+      const headers = timeframes.map((item) => `<th>${item.timeframe}</th>`).join("");
+      const body = rows.map((row) => {
+        const cells = (row.timeframes || []).map((item) =>
+          `<td title="${item.status}">
+            ${item.rows}
+            ${item.status !== "OK" ? `<button class="inline-mini" type="button" data-redownload-dataset data-symbol="${row.symbol}" data-timeframe="${item.timeframe}">Re-descargar</button>` : ""}
+          </td>`
+        ).join("");
+        return `
+          <tr>
+            <td>${row.symbol}</td>
+            <td>${row.available}/${row.total}</td>
+            <td>${row.total_rows}</td>
+            ${cells}
+          </tr>
+        `;
+      }).join("");
+      target.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Coverage</th>
+              <th>Total rows</th>
+              ${headers}
+            </tr>
+          </thead>
+          <tbody>${body}</tbody>
+        </table>
+      `;
+      applyTableHeat(target.querySelector("table"));
+      target.querySelectorAll("[data-redownload-dataset]").forEach((button) => {
+        button.addEventListener("click", () => redownloadDataset(button));
+      });
+    }
+
+    async function loadSavedResults() {
+      if (savedResultsLoaded) return;
+      const panel = document.querySelector("[data-saved-results-panel]");
+      if (!panel) return;
+      panel.innerHTML = '<section class="empty">Cargando resultados guardados...</section>';
+      const response = await fetch("/saved-results?limit=50");
+      const payload = await response.json();
+      const rows = payload.rows || [];
+      if (!rows.length) {
+        panel.innerHTML = '<section class="empty">No saved backtest results yet.</section>';
+        savedResultsLoaded = true;
+        return;
+      }
+      const body = rows.map((item) => `
+        <tr>
+          <td>${item.created_at || ""}</td>
+          <td>${item.symbol || ""}</td>
+          <td>${item.timeframe || ""}</td>
+          <td>${item.strategy || ""}</td>
+          <td>${item.date_range || ""}</td>
+          <td>${item.strategy_gain || ""}</td>
+          <td>${item.buy_hold || ""}</td>
+          <td>${item.alpha || ""}</td>
+          <td>${item.drawdown || ""}</td>
+          <td>${item.trades || ""}</td>
+          <td>${item.profit_factor || ""}</td>
+          <td>${item.validation_gain || ""}</td>
+          <td>${item.validation_verdict || ""}</td>
+          <td><a class="button-primary" href="/?exchange=${encodeURIComponent(item.exchange || "binance")}&symbol=${encodeURIComponent(item.symbol || "")}&timeframe=${encodeURIComponent(item.timeframe || "")}&strategy=${encodeURIComponent(item.strategy_key || "")}&start_date=${encodeURIComponent(item.start_date || "")}&end_date=${encodeURIComponent(item.end_date || "")}&run_analysis=true">Open</a></td>
+        </tr>
+      `).join("");
+      panel.innerHTML = `
+        <div class="table-header"><h2>Saved backtest results</h2><span>Last ${rows.length} snapshots</span></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Saved</th><th>Symbol</th><th>TF</th><th>Strategy</th><th>Range</th><th>Gain</th><th>Buy & hold</th><th>Alpha</th><th>Drawdown</th><th>Trades</th><th>PF</th><th>Validation</th><th>Verdict</th><th>Open</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table></div>`;
+      applyTableHeat(panel.querySelector("table"));
+      savedResultsLoaded = true;
+    }
+
+    async function loadCustomStrategies() {
+      if (customStrategiesLoaded) return;
+      const panel = document.querySelector("[data-custom-strategies-panel]");
+      if (!panel) return;
+      panel.innerHTML = '<section class="empty">Cargando estrategias custom...</section>';
+      const response = await fetch("/custom-strategies");
+      const payload = await response.json();
+      const rows = payload.rows || [];
+      if (!rows.length) {
+        panel.innerHTML = '<section class="empty">No custom strategies uploaded yet.</section>';
+        customStrategiesLoaded = true;
+        return;
+      }
+      const body = rows.map((item) => `
+        <tr>
+          <td>${item.label || ""}</td>
+          <td>${item.key || ""}</td>
+          <td>${item.path || ""}</td>
+          <td>
+            <form method="post" action="/strategies/delete">
+              <input type="hidden" name="strategy_key" value="${item.key || ""}">
+              <button class="button-muted" type="submit">Delete</button>
+            </form>
+          </td>
+        </tr>
+      `).join("");
+      panel.innerHTML = `
+        <div class="table-header"><h2>Custom strategies</h2><span>${rows.length} uploaded</span></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Strategy</th><th>Key</th><th>Path</th><th>Action</th></tr></thead>
+          <tbody>${body}</tbody>
+        </table></div>`;
+      customStrategiesLoaded = true;
+    }
+
+    async function redownloadDataset(button) {
+      const form = document.getElementById("dashboard-form");
+      const payload = new FormData();
+      payload.set("exchange", form.elements.exchange.value);
+      payload.set("symbol", button.dataset.symbol);
+      payload.set("timeframe", button.dataset.timeframe);
+      payload.set("fetch_since", form.elements.fetch_since.value || "2024-01-01");
+      payload.set("fetch_until", form.elements.fetch_until.value || "");
+      payload.set("fetch_batch_limit", form.elements.fetch_batch_limit.value || "1000");
+      payload.set("fetch_max_batches", form.elements.fetch_max_batches.value || "0");
+      button.disabled = true;
+      button.textContent = "Descargando";
+      const response = await fetch("/datasets/redownload", { method: "POST", body: payload });
+      const result = await response.json();
+      button.textContent = result.ok ? "OK" : "Error";
+      datasetStatusLoaded = false;
+      await loadDatasetStatus();
+    }
 
     const heatClasses = [
       "heat-awful",
@@ -2163,7 +2503,8 @@
       cell.classList.add(className);
     }
 
-    document.querySelectorAll(".table-panel table").forEach((table) => {
+    function applyTableHeat(table) {
+      if (!table) return;
       const headers = Array.from(table.querySelectorAll("thead th")).map((header) =>
         header.textContent.trim().toLowerCase()
       );
@@ -2188,7 +2529,9 @@
           applyHeatClass(cell, className);
         });
       });
-    });
+    }
+
+    document.querySelectorAll(".table-panel table").forEach(applyTableHeat);
   </script>
 </body>
 </html>

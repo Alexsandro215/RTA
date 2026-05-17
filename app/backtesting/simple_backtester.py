@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import cast
 
 import pandas as pd
 
@@ -75,6 +76,7 @@ def run_long_only_signal_backtest(
                 should_exit = True
 
         if should_exit:
+            assert entry_price is not None
             exit_price = _apply_exit_slippage(
                 close,
                 slippage_rate,
@@ -223,8 +225,8 @@ def run_long_only_signal_backtest(
         best_trade_pct=trade_stats["best_trade_pct"],
         worst_trade_pct=trade_stats["worst_trade_pct"],
         average_trade_pct=trade_stats["average_trade_pct"],
-        max_winning_streak=trade_stats["max_winning_streak"],
-        max_losing_streak=trade_stats["max_losing_streak"],
+        max_winning_streak=int(trade_stats["max_winning_streak"]),
+        max_losing_streak=int(trade_stats["max_losing_streak"]),
         final_equity=equity,
         equity_curve=equity_frame,
         trade_log=trade_log,
@@ -278,13 +280,15 @@ def _calculate_trade_stats(trade_log: pd.DataFrame) -> dict[str, float | int]:
     gross_loss = abs(trade_log.loc[trade_log["pl_usd"] < 0, "pl_usd"].sum())
     profit_factor = gross_profit / gross_loss if gross_loss > 0 else float("inf")
 
-    max_winning_streak, max_losing_streak = _calculate_streaks(trade_log["pl_usd"])
+    pl_usd = cast(pd.Series, trade_log["pl_usd"])
+    return_pct = cast(pd.Series, trade_log["return_pct"])
+    max_winning_streak, max_losing_streak = _calculate_streaks(pl_usd)
 
     return {
         "profit_factor": float(profit_factor),
-        "best_trade_pct": float(trade_log["return_pct"].max()),
-        "worst_trade_pct": float(trade_log["return_pct"].min()),
-        "average_trade_pct": float(trade_log["return_pct"].mean()),
+        "best_trade_pct": float(return_pct.max()),
+        "worst_trade_pct": float(return_pct.min()),
+        "average_trade_pct": float(return_pct.mean()),
         "max_winning_streak": max_winning_streak,
         "max_losing_streak": max_losing_streak,
     }

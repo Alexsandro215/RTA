@@ -6,3 +6,4 @@ venv/
 *.err
 *.out
 data/raw/
+data/cache/

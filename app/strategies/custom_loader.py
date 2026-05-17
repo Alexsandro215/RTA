@@ -5,7 +5,7 @@ import importlib.util
 from pathlib import Path
 import re
 from types import ModuleType
-from typing import Callable
+from typing import Callable, cast
 
 import pandas as pd
 
@@ -103,13 +103,23 @@ def apply_custom_strategy(data: pd.DataFrame, key: str) -> pd.DataFrame:
     return result
 
 
+def get_custom_strategy_metadata(key: str) -> dict[str, object]:
+    strategy = get_custom_strategy(key)
+    if strategy is None:
+        return {}
+
+    module = _load_module(strategy)
+    metadata = getattr(module, "STRATEGY_METADATA", {})
+    return metadata if isinstance(metadata, dict) else {}
+
+
 def _load_apply_function(strategy: CustomStrategy) -> Callable[[pd.DataFrame], pd.DataFrame]:
     module = _load_module(strategy)
     apply_strategy = getattr(module, "apply_strategy", None)
     if not callable(apply_strategy):
         raise ValueError("Strategy file must define apply_strategy(data)")
 
-    return apply_strategy
+    return cast(Callable[[pd.DataFrame], pd.DataFrame], apply_strategy)
 
 
 def _load_module(strategy: CustomStrategy) -> ModuleType:

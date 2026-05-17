@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, cast
 
 import ccxt
 import pandas as pd
@@ -179,7 +179,8 @@ class CCXTMarketDataProvider(MarketDataProvider):
         symbol: str,
         exchange: str,
     ) -> None:
-        if symbol not in exchange_client.markets:
+        markets = exchange_client.markets or {}
+        if symbol not in markets:
             raise InvalidSymbolError(
                 f"Symbol '{symbol}' is not available on exchange '{exchange}'."
             )
@@ -227,7 +228,7 @@ class CCXTMarketDataProvider(MarketDataProvider):
         data = pd.DataFrame(rows, columns=self.COLUMNS)
         data["datetime"] = pd.to_datetime(data["timestamp"], unit="ms", utc=True)
 
-        return data[
+        return cast(pd.DataFrame, data[
             [
                 "timestamp",
                 "open",
@@ -237,4 +238,4 @@ class CCXTMarketDataProvider(MarketDataProvider):
                 "volume",
                 "datetime",
             ]
-        ]
+        ])
